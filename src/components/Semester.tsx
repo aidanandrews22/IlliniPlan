@@ -1,30 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import invariant from "tiny-invariant";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
-
-
 import CourseCard from "./CourseCard";
-
-interface Course {
-  id: string;
-  subject: string;
-  number: string;
-  name: string;
-  description: string;
-  creditHours: string;
-  degreeAttributes?: string;
-  scheduleInformation?: string;
-  sectionInfo?: string;
-  terms: string[];
-  yearTerms: string[];
-  years: string[];
-}
+import type { DisplayCourse } from "../types/database";
 
 interface SemesterProps {
   id: string;
   name: string;
   completed: boolean;
-  coursecards: Course[];
+  coursecards: DisplayCourse[];
   onRemove: () => void;
   onToggleComplete: () => void;
   onAddCourse: () => void;
@@ -137,6 +121,6 @@ const Semester = ({
       </div>
     </div>
   );
-};
+}
 
 export default Semester;

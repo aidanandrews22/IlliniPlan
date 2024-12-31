@@ -10,20 +10,10 @@ import {
   extractClosestEdge,
   Edge 
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
+import CourseDetailsModal from "./CourseDetailsModal";
+import type { CourseData, DisplayCourse } from "../types/database";
 
-interface CourseCardProps {
-  id: string;
-  subject: string;
-  number: string;
-  name: string;
-  description: string;
-  creditHours: string;
-  degreeAttributes?: string;
-  scheduleInformation?: string;
-  sectionInfo?: string;
-  terms: string[];
-  yearTerms: string[];
-  years: string[];
+interface CourseCardProps extends DisplayCourse {
   isDragged: boolean;
   isTrashHovered: boolean;
   onDragStart: () => void;
@@ -92,6 +82,51 @@ const CourseCard = ({
     }
   };
 
+  // Create a CourseData object from the props
+  const courseData: CourseData = {
+    id: parseInt(id),
+    subject,
+    number,
+    title: name,
+    description,
+    credit_hours: creditHours,
+    degree_attributes: degreeAttributes || null,
+    section_info: null,
+    course_geneds: {
+      id: parseInt(id),
+      course_id: parseInt(id),
+      acp: false,
+      cs: 'False' as const,
+      hum: 'False' as const,
+      nat: 'False' as const,
+      qr: 'False' as const,
+      sbs: 'False' as const
+    },
+    course_prereqs: null,
+    course_offerings: terms.map((term, index) => {
+      const [season, year] = term.split(' ');
+      const seasonCode = {
+        'Fall': 'fa',
+        'Spring': 'sp',
+        'Summer': 'su',
+        'Winter': 'wi'
+      }[season] || season.toLowerCase();
+      
+      return {
+        id: index + 1,
+        course_id: parseInt(id),
+        term_id: index + 1,
+        terms: {
+          id: index + 1,
+          season: seasonCode as "fa" | "sp" | "su" | "wi",
+          year: parseInt(year),
+          combined: `${seasonCode}${year}`
+        },
+        course_gpas: []
+      };
+    })
+  };
+
   return (
     <>
       <div 
@@ -141,68 +176,11 @@ const CourseCard = ({
       </div>
 
       {isModalOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
-          onClick={(e) => {
-            if (e.target === e.currentTarget) {
-              setIsModalOpen(false);
-            }
-          }}
-        >
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="p-6">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
-                    {subject} {number}
-                  </h2>
-                  <p className="text-xl text-gray-700 dark:text-gray-300 mt-1">
-                    {name}
-                  </p>
-                </div>
-                <button
-                  onClick={() => setIsModalOpen(false)}
-                  className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
-                >
-                  ✕
-                </button>
-              </div>
-              
-              <div className="mt-6 space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Description</h3>
-                  <p className="mt-2 text-gray-700 dark:text-gray-300">{description}</p>
-                </div>
-                
-                {degreeAttributes && (
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Degree Attributes</h3>
-                    <p className="mt-2 text-gray-700 dark:text-gray-300">{degreeAttributes}</p>
-                  </div>
-                )}
-                
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Credit Hours</h3>
-                  <p className="mt-2 text-gray-700 dark:text-gray-300">{creditHours}</p>
-                </div>
-                
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Available Terms</h3>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {terms.map((term) => (
-                      <span 
-                        key={term}
-                        className="px-3 py-1 text-sm font-medium bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full"
-                      >
-                        {term}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <CourseDetailsModal
+          course={courseData}
+          onClose={() => setIsModalOpen(false)}
+          showAddToSemester={false}
+        />
       )}
     </>
   );

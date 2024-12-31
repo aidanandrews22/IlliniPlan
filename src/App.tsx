@@ -3,7 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Plan from './pages/Plan';
 import Explore from './pages/Explore';
 import Navigation from './components/Navigation';
-import type { CourseData } from './types/database';
+import type { CourseData, DisplayCourse, SemestersData } from './types/database';
 import type { Database } from './types/supabase';
 import { useUser } from '@clerk/clerk-react';
 import { 
@@ -25,32 +25,6 @@ interface SemesterIds {
 
 interface CourseIds {
   [key: string]: number; // Maps course display ID to database ID
-}
-
-interface SemesterData {
-  id: string;
-  name: string;
-  completed: boolean;
-  coursecards: Course[];
-}
-
-interface Course {
-  id: string;
-  subject: string;
-  number: string;
-  name: string;
-  description: string;
-  creditHours: string;
-  degreeAttributes?: string;
-  scheduleInformation?: string;
-  sectionInfo?: string;
-  terms: string[];
-  yearTerms: string[];
-  years: string[];
-}
-
-interface SemestersData {
-  [key: string]: SemesterData;
 }
 
 type CourseOffering = Database['public']['Tables']['course_offerings']['Row'] & {
@@ -134,7 +108,15 @@ const App = () => {
                 description: course.description || '',
                 creditHours: course.credit_hours || '',
                 degreeAttributes: course.degree_attributes || '',
-                terms: course.course_offerings?.map((o: CourseOffering) => o.terms.season) || [],
+                terms: course.course_offerings?.map(o => {
+                  const seasonName = {
+                    'fa': 'Fa',
+                    'sp': 'Sp',
+                    'su': 'Su',
+                    'wi': 'Wi'
+                  }[o.terms.season] || o.terms.season.toUpperCase();
+                  return `${seasonName} ${o.terms.year}`;
+                }) || [],
                 yearTerms: course.course_offerings?.map((o: CourseOffering) => `${o.terms.year}-${o.terms.season}`) || [],
                 years: course.course_offerings?.map((o: CourseOffering) => o.terms.year.toString()) || []
               };
@@ -163,7 +145,7 @@ const App = () => {
       const newCourseId = `${course.subject}${course.number}_${Date.now()}`;
       
       // Convert course data to the format expected by the semester
-      const newCourse: Course = {
+      const newCourse: DisplayCourse = {
         id: newCourseId,
         subject: course.subject || '',
         number: course.number || '',
@@ -171,7 +153,15 @@ const App = () => {
         description: course.description || '',
         creditHours: course.credit_hours || '',
         degreeAttributes: course.degree_attributes || '',
-        terms: course.course_offerings?.map(o => o.terms.season) || [],
+        terms: course.course_offerings?.map(o => {
+          const seasonName = {
+            'fa': 'Fall',
+            'sp': 'Spring',
+            'su': 'Summer',
+            'wi': 'Winter'
+          }[o.terms.season] || o.terms.season.toUpperCase();
+          return `${seasonName} ${o.terms.year}`;
+        }) || [],
         yearTerms: course.course_offerings?.map(o => `${o.terms.year}-${o.terms.season}`) || [],
         years: course.course_offerings?.map(o => o.terms.year.toString()) || []
       };
