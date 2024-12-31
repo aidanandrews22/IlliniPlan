@@ -241,6 +241,7 @@ const App = () => {
                   semesterIds={semesterIds}
                   courseIds={courseIds}
                   setCourseIds={setCourseIds}
+                  onAddToSemester={handleAddToSemester}
                 />
               } 
             />

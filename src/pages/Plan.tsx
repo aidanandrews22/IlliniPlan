@@ -56,6 +56,7 @@ interface PlanProps {
   semesterIds: { [key: string]: { planId: number; termId: number; } };
   courseIds: { [key: string]: number };
   setCourseIds: Dispatch<SetStateAction<{ [key: string]: number }>>;
+  onAddToSemester: (course: CourseData, semesterId: string) => void;
 }
 
 const Plan = ({ 
@@ -64,7 +65,8 @@ const Plan = ({
   userId,
   semesterIds,
   courseIds,
-  setCourseIds
+  setCourseIds,
+  onAddToSemester
 }: PlanProps) => {
   const [isTrashHovered, setIsTrashHovered] = useState(false);
   const [draggedCourseId, setDraggedCourseId] = useState<string | null>(null);
@@ -277,35 +279,8 @@ const Plan = ({
   };
 
   const handleCourseSelect = (course: CourseData) => {
-    if (!selectedSemesterId) return;
-
-    setSemestersData(prev => {
-      const semester = prev[selectedSemesterId];
-      const newCourseId = `${course.subject}${course.number}_${Date.now()}`;
-      
-      // Convert course data to the format expected by the semester
-      const newCourse: Course = {
-        id: newCourseId,
-        subject: course.subject || '',
-        number: course.number || '',
-        name: course.title || '',
-        description: course.description || '',
-        creditHours: course.credit_hours || '',
-        degreeAttributes: course.degree_attributes || '',
-        terms: course.course_offerings?.map(o => o.terms.season) || [],
-        yearTerms: course.course_offerings?.map(o => `${o.terms.year}-${o.terms.season}`) || [],
-        years: course.course_offerings?.map(o => o.terms.year.toString()) || []
-      };
-
-      return {
-        ...prev,
-        [selectedSemesterId]: {
-          ...semester,
-          coursecards: [...semester.coursecards, newCourse]
-        }
-      };
-    });
-
+    if (!selectedSemesterId || !onAddToSemester) return;
+    onAddToSemester(course, selectedSemesterId);
     setIsAddCourseModalOpen(false);
     setSelectedSemesterId(null);
   };
@@ -397,6 +372,7 @@ const Plan = ({
           }}
           onSelectCourse={handleCourseSelect}
           title={`Add Course to ${semestersData[selectedSemesterId].name}`}
+          semesterId={selectedSemesterId}
         />
       )}
     </div>

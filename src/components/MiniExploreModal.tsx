@@ -9,11 +9,12 @@ interface MiniExploreModalProps {
   onClose: () => void;
   onSelectCourse: (course: CourseData) => void;
   title?: string;
+  semesterId: string;
 }
 
 const ITEMS_PER_PAGE = 20;
 
-const MiniExploreModal = ({ onClose, onSelectCourse, title = 'Add Course' }: MiniExploreModalProps) => {
+const MiniExploreModal = ({ onClose, onSelectCourse, title = 'Add Course', semesterId }: MiniExploreModalProps) => {
   const [courses, setCourses] = useState<CourseData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -183,7 +184,9 @@ const MiniExploreModal = ({ onClose, onSelectCourse, title = 'Add Course' }: Min
                 <div
                   key={`${course.subject}${course.number}`}
                   className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4 hover:shadow-md transition-shadow duration-200 cursor-pointer"
-                  onClick={() => onSelectCourse(course)}
+                  onClick={() => {
+                    onSelectCourse(course);
+                  }}
                 >
                   <div className="flex justify-between items-start">
                     <div>
