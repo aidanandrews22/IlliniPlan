@@ -168,7 +168,14 @@ const Plan = ({
               });
             } else {
               // Queue the move operation in the database
+              const courseToMove = semesterData.coursecards[draggedCourseCardIndex];
               const courseId = courseIds[draggedCourseCardId];
+
+              if (!courseId) {
+                console.error('Could not find course ID for:', draggedCourseCardId);
+                return;
+              }
+
               dbQueue.addOperation({
                 type: 'MOVE_COURSE',
                 payload: {
@@ -218,7 +225,14 @@ const Plan = ({
                 : indexOfTarget;
 
               // Queue the move operation in the database
+              const courseToMove = semesterData.coursecards[draggedCourseCardIndex];
               const courseId = courseIds[draggedCourseCardId];
+
+              if (!courseId) {
+                console.error('Could not find course ID for:', draggedCourseCardId);
+                return;
+              }
+
               dbQueue.addOperation({
                 type: 'MOVE_COURSE',
                 payload: {

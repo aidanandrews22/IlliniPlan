@@ -39,6 +39,13 @@ interface SemesterPayload {
   semesterId: string;
 }
 
+interface SupabaseError {
+  code?: string;
+  message?: string;
+  details?: string;
+  hint?: string;
+}
+
 const MAX_RETRIES = 3;
 const DEBOUNCE_WAIT = 1000; // 1 second
 
@@ -50,17 +57,70 @@ class DbOperationQueue {
     if (this.processing || this.queue.length === 0) return;
     this.processing = true;
 
-    const operation = this.queue[0];
     try {
-      await this.executeOperation(operation);
-      this.queue.shift(); // Remove the operation if successful
-    } catch (error) {
-      console.error('Error processing operation:', error);
-      if (!operation.retries) operation.retries = 0;
+      // Create a Map to store the latest operation for each unique context
+      // Key format: `${type}-${userId}-${contextSpecificKeys}`
+      const latestOps = new Map<string, number>();  // Maps context key to queue index
+
+      // First pass: O(n) to find latest operations
+      for (let i = 0; i < this.queue.length; i++) {
+        const op = this.queue[i];
+        let contextKey: string;
+
+        switch (op.type) {
+          case 'ADD_COURSE':
+          case 'REMOVE_COURSE': {
+            const payload = op.payload as AddCoursePayload | RemoveCoursePayload;
+            contextKey = `${op.type}-${payload.userId}-${payload.semesterId}-${payload.courseId}`;
+            break;
+          }
+          case 'MOVE_COURSE': {
+            const payload = op.payload as MoveCoursePayload;
+            contextKey = `${op.type}-${payload.userId}-${payload.courseId}`;
+            break;
+          }
+          case 'DELETE_SEMESTER':
+          case 'ADD_SEMESTER': {
+            const payload = op.payload as SemesterPayload;
+            contextKey = `${op.type}-${payload.userId}-${payload.semesterId}`;
+            break;
+          }
+          default:
+            contextKey = `${op.type}-${JSON.stringify(op.payload)}`;
+        }
+
+        latestOps.set(contextKey, i);
+      }
+
+      // Second pass: O(n) to execute only the latest operations
+      const processedIndices = new Set<number>();
       
-      if (operation.retries < MAX_RETRIES) {
-        operation.retries++;
-        // Move to end of queue for retry
+      for (const index of latestOps.values()) {
+        if (!processedIndices.has(index)) {
+          await this.executeOperation(this.queue[index]);
+          processedIndices.add(index);
+        }
+      }
+
+      // Clear the entire queue since we've processed what we need
+      this.queue = [];
+    } catch (error: unknown) {
+      console.error('Error processing operation:', error);
+      const operation = this.queue[0];
+
+      // Check if this is an expected "not found" error
+      const supaError = error as SupabaseError;
+      const isExpectedError = 
+        supaError?.code === 'PGRST116' || // Supabase "no rows" error
+        (supaError?.message && supaError.message.includes('JSON object requested, multiple (or no) rows returned'));
+
+      if (isExpectedError) {
+        // Skip retrying for expected errors - the operation was likely already completed
+        this.queue.shift();
+        console.log('Skipping retry for already completed operation:', operation.type);
+      } else if (!operation.retries || operation.retries < MAX_RETRIES) {
+        // Only retry for unexpected errors
+        operation.retries = (operation.retries || 0) + 1;
         this.queue.shift();
         this.queue.push(operation);
       } else {
