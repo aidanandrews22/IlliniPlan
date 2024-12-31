@@ -1,4 +1,5 @@
 import type { CourseData } from '../types/database';
+import { formatCreditHours, getLatestTermGPA, formatGenEds, formatTerms } from '../utils/courseUtils';
 
 interface CourseDetailsModalProps {
   course: CourseData;
@@ -8,6 +9,20 @@ interface CourseDetailsModalProps {
 }
 
 const CourseDetailsModal = ({ course, onClose, onAddToSemester, showAddToSemester }: CourseDetailsModalProps) => {
+  const averageGPA = getLatestTermGPA(course);
+  const genEds = formatGenEds(course);
+  const formattedTerms = formatTerms(course);
+  const creditHours = formatCreditHours(course.credit_hours);
+
+  // Group gen eds by category
+  const genEdsByCategory = genEds.reduce((acc, genEd) => {
+    if (!acc[genEd.category]) {
+      acc[genEd.category] = [];
+    }
+    acc[genEd.category].push(genEd);
+    return acc;
+  }, {} as Record<string, typeof genEds>);
+
   return (
     <div 
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
@@ -37,73 +52,75 @@ const CourseDetailsModal = ({ course, onClose, onAddToSemester, showAddToSemeste
           </div>
           
           <div className="mt-6 space-y-4">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Credit Hours</h3>
+                <p className="mt-2 text-gray-700 dark:text-gray-300">{creditHours}</p>
+              </div>
+              {averageGPA && (
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Average GPA</h3>
+                  <p className="mt-2 text-gray-700 dark:text-gray-300">{averageGPA}</p>
+                </div>
+              )}
+            </div>
+
             <div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Description</h3>
               <p className="mt-2 text-gray-700 dark:text-gray-300">{course.description}</p>
             </div>
-            
+
             {course.degree_attributes && (
               <div>
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Degree Attributes</h3>
                 <p className="mt-2 text-gray-700 dark:text-gray-300">{course.degree_attributes}</p>
               </div>
             )}
-            
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Credit Hours</h3>
-              <p className="mt-2 text-gray-700 dark:text-gray-300">{course.credit_hours}</p>
-            </div>
 
-            {course.course_offerings && course.course_offerings.length > 0 && (
+            {genEds.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Terms</h3>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {course.course_offerings.map((offering) => (
-                    <span
-                      key={offering.term_id}
-                      className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-sm"
-                    >
-                      {offering.terms.season.toUpperCase()} {offering.terms.year}
-                    </span>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Gen Eds</h3>
+                <div className="mt-2 space-y-4">
+                  {Object.entries(genEdsByCategory).map(([category, categoryGenEds]) => (
+                    <div key={category} className="space-y-2">
+                      <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        {category}
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {categoryGenEds.map((genEd) => (
+                          <div
+                            key={genEd.code}
+                            className="group relative"
+                          >
+                            <span
+                              className="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded text-sm cursor-help"
+                            >
+                              {genEd.code}
+                            </span>
+                            <div className="absolute bottom-full left-0 mb-2 w-48 p-2 bg-gray-900 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                              {genEd.description}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
             )}
 
-            {course.course_geneds && Object.values(course.course_geneds).some(val => val !== 'False' && val !== false) && (
+            {formattedTerms.length > 0 && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Gen Eds</h3>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">Recent Terms</h3>
                 <div className="mt-2 flex flex-wrap gap-2">
-                  {course.course_geneds.acp && (
-                    <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded text-sm">
-                      ACP
+                  {formattedTerms.map((term, index) => (
+                    <span
+                      key={index}
+                      className="px-2 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded text-sm"
+                    >
+                      {term}
                     </span>
-                  )}
-                  {course.course_geneds.cs && course.course_geneds.cs !== 'False' && (
-                    <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded text-sm">
-                      {course.course_geneds.cs}
-                    </span>
-                  )}
-                  {course.course_geneds.hum && course.course_geneds.hum !== 'False' && (
-                    <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded text-sm">
-                      {course.course_geneds.hum}
-                    </span>
-                  )}
-                  {course.course_geneds.nat && course.course_geneds.nat !== 'False' && (
-                    <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded text-sm">
-                      {course.course_geneds.nat}
-                    </span>
-                  )}
-                  {course.course_geneds.qr && course.course_geneds.qr !== 'False' && (
-                    <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded text-sm">
-                      {course.course_geneds.qr}
-                    </span>
-                  )}
-                  {course.course_geneds.sbs && course.course_geneds.sbs !== 'False' && (
-                    <span className="px-2 py-1 bg-purple-100 dark:bg-purple-900 text-purple-700 dark:text-purple-300 rounded text-sm">
-                      {course.course_geneds.sbs}
-                    </span>
-                  )}
+                  ))}
                 </div>
               </div>
             )}
