@@ -7,6 +7,7 @@ export type CourseData = Database['public']['Tables']['courses']['Row'] & {
     terms: Database['public']['Tables']['terms']['Row'];
     course_gpas: Database['public']['Tables']['course_gpas']['Row'][];
   })[];
+  course_gpas: Database['public']['Tables']['course_gpas']['Row'][];
 };
 
 export interface DisplayCourse {

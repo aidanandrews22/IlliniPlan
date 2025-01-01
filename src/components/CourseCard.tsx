@@ -12,7 +12,7 @@ import {
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import CourseDetailsModal from "./CourseDetailsModal";
 import type { CourseData, DisplayCourse } from "../types/database";
-import { getCourseGenEds } from "../lib/supabase";
+import { getCourseGenEds, getCourseGPAs } from "../lib/supabase";
 
 interface CourseCardProps extends DisplayCourse {
   isDragged: boolean;
@@ -41,18 +41,23 @@ const CourseCard = ({
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [courseGenEds, setCourseGenEds] = useState<CourseData['course_geneds']>(null);
+  const [courseGPAs, setCourseGPAs] = useState<CourseData['course_gpas']>([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    const fetchGenEds = async () => {
+    const fetchData = async () => {
       if (isModalOpen && databaseId) {
         setLoading(true);
-        const genEds = await getCourseGenEds(databaseId);
+        const [genEds, gpas] = await Promise.all([
+          getCourseGenEds(databaseId),
+          getCourseGPAs(databaseId)
+        ]);
         setCourseGenEds(genEds);
+        setCourseGPAs(gpas);
         setLoading(false);
       }
     };
-    fetchGenEds();
+    fetchData();
   }, [isModalOpen, databaseId]);
 
   useEffect(() => {
@@ -111,6 +116,7 @@ const CourseCard = ({
     section_info: null,
     course_geneds: courseGenEds,
     course_prereqs: null,
+    course_gpas: courseGPAs,
     course_offerings: terms.map((term, index) => {
       const [season, year] = term.split(' ');
       const seasonCode = {

@@ -137,20 +137,20 @@ export async function getCourseOfferings(courseId: number) {
 }
 
 // Course GPAs
-export async function getCourseGPAs(courseId: number, termId: number) {
+export const getCourseGPAs = async (courseId: number) => {
   const { data, error } = await supabase
     .from('course_gpas')
     .select('*')
     .eq('course_id', courseId)
-    .eq('term_id', termId);
+    .order('term_id', { ascending: false });
 
   if (error) {
     console.error('Error fetching course GPAs:', error);
     return [];
   }
 
-  return data;
-}
+  return data || [];
+};
 
 // Course Prerequisites
 export async function getCoursePrereqs(courseId: number) {
