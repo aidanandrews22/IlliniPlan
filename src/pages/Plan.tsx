@@ -313,12 +313,39 @@ const Plan = ({
   };
 
   const handleCourseDelete = (courseId: string) => {
+    // Find which semester contains this course
+    let semesterId: string | null = null;
+    Object.entries(semestersData).forEach(([id, semester]) => {
+      if (semester.coursecards.some(course => course.id === courseId)) {
+        semesterId = id;
+      }
+    });
+
+    if (!semesterId || !userId) return;
+
+    // Remove from database
+    const numericCourseId = courseIds[courseId];
+    if (!numericCourseId) {
+      console.error('Could not find course ID for:', courseId);
+      return;
+    }
+
+    // Queue the remove operation
+    dbQueue.addOperation({
+      type: 'REMOVE_COURSE',
+      payload: {
+        userId,
+        semesterId,
+        courseId: numericCourseId
+      }
+    });
+
+    // Update UI
     setSemestersData(prev => {
       const newData = { ...prev };
-      // Find and remove the course from any semester that contains it
-      Object.entries(newData).forEach(([semesterId, semester]) => {
+      Object.entries(newData).forEach(([id, semester]) => {
         if (semester && semester.coursecards) {
-          newData[semesterId] = {
+          newData[id] = {
             ...semester,
             coursecards: semester.coursecards.filter(course => course.id !== courseId)
           };

@@ -145,9 +145,17 @@ const App = () => {
   const handleAddToSemester = async (course: CourseData, semesterId: string) => {
     if (!user) return;
 
+    // Generate a unique ID for the course display
+    const newCourseId = `${course.subject}${course.number}_${Date.now()}`;
+    
+    // Update the courseIds mapping immediately
+    setCourseIds(prev => ({
+      ...prev,
+      [newCourseId]: course.id
+    }));
+
     setSemestersData(prev => {
       const semester = prev[semesterId];
-      const newCourseId = `${course.subject}${course.number}_${Date.now()}`;
       
       // Convert course data to the format expected by the semester
       const newCourse: DisplayCourse = {
