@@ -17,6 +17,7 @@ interface SemesterProps {
   isTrashHovered: boolean;
   onDragStart: (courseId: string) => void;
   onDragEnd: () => void;
+  courseIds?: { [key: string]: number };
 }
 
 const Semester = ({ 
@@ -31,7 +32,8 @@ const Semester = ({
   draggedCourseId,
   isTrashHovered,
   onDragStart,
-  onDragEnd
+  onDragEnd,
+  courseIds = {}
 }: SemesterProps) => {
   const semesterRef = useRef<HTMLDivElement>(null);
   const [isDraggedOver, setIsDraggedOver] = useState(false);
@@ -103,6 +105,7 @@ const Semester = ({
             isTrashHovered={isTrashHovered && draggedCourseId === course.id}
             onDragStart={() => onDragStart(course.id)}
             onDragEnd={onDragEnd}
+            databaseId={courseIds[course.id]}
           />
         ))}
         {coursecards.length === 0 && (

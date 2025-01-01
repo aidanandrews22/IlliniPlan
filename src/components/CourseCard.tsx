@@ -18,6 +18,7 @@ interface CourseCardProps extends DisplayCourse {
   isTrashHovered: boolean;
   onDragStart: () => void;
   onDragEnd: () => void;
+  databaseId?: number;
 }
 
 const CourseCard = ({ 
@@ -32,7 +33,8 @@ const CourseCard = ({
   isDragged,
   isTrashHovered,
   onDragStart,
-  onDragEnd
+  onDragEnd,
+  databaseId
 }: CourseCardProps) => {
   const coursecardRef = useRef<HTMLDivElement>(null);
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
@@ -84,7 +86,7 @@ const CourseCard = ({
 
   // Create a CourseData object from the props
   const courseData: CourseData = {
-    id: parseInt(id),
+    id: databaseId || 0,
     subject,
     number,
     title: name,
@@ -92,16 +94,7 @@ const CourseCard = ({
     credit_hours: creditHours,
     degree_attributes: degreeAttributes || null,
     section_info: null,
-    course_geneds: {
-      id: parseInt(id),
-      course_id: parseInt(id),
-      acp: false,
-      cs: 'False' as const,
-      hum: 'False' as const,
-      nat: 'False' as const,
-      qr: 'False' as const,
-      sbs: 'False' as const
-    },
+    course_geneds: null,
     course_prereqs: null,
     course_offerings: terms.map((term, index) => {
       const [season, year] = term.split(' ');
@@ -114,7 +107,7 @@ const CourseCard = ({
       
       return {
         id: index + 1,
-        course_id: parseInt(id),
+        course_id: databaseId || 0,
         term_id: index + 1,
         terms: {
           id: index + 1,
@@ -126,6 +119,10 @@ const CourseCard = ({
       };
     })
   };
+
+  console.log("CourseCard - courseData:", courseData);
+  console.log("CourseCard - course_geneds:", courseData.course_geneds);
+  console.log("CourseCard - databaseId:", databaseId);
 
   return (
     <>

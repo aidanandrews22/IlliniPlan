@@ -294,6 +294,7 @@ const Plan = ({
 
   const handleCourseSelect = (course: CourseData) => {
     if (!selectedSemesterId || !onAddToSemester) return;
+    console.log("Plan - handleCourseSelect - course:", course);
     onAddToSemester(course, selectedSemesterId);
     setIsAddCourseModalOpen(false);
     setSelectedSemesterId(null);
@@ -365,6 +366,7 @@ const Plan = ({
             isTrashHovered={isTrashHovered}
             onDragStart={handleDragStart}
             onDragEnd={handleDragEnd}
+            courseIds={courseIds}
           />
         ))}
       </div>

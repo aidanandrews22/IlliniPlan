@@ -11,6 +11,7 @@ interface CourseDetailsModalProps {
 const CourseDetailsModal = ({ course, onClose, onAddToSemester, showAddToSemester }: CourseDetailsModalProps) => {
   const averageGPA = getLatestTermGPA(course);
   const genEds = formatGenEds(course);
+  console.log("genEds: ", genEds);
   const formattedTerms = formatTerms(course);
   const creditHours = formatCreditHours(course.credit_hours);
 

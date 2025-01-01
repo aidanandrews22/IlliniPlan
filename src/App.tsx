@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Plan from './pages/Plan';
 import Explore from './pages/Explore';
 import Navigation from './components/Navigation';
@@ -14,6 +14,9 @@ import {
   createSemesterPlan,
   parseSemesterId
 } from './lib/supabase';
+import { SignedIn, SignedOut } from '@clerk/clerk-react';
+import SignIn from './pages/SignIn';
+import SignUp from './pages/SignUp';
 
 // Add interfaces for storing IDs
 interface SemesterIds {
@@ -218,35 +221,46 @@ const App = () => {
   return (
     <Router>
       <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
-        <Navigation />
-        <main className="container mx-auto px-4 py-8 pt-20">
+        <SignedIn>
+          <Navigation />
+          <main className="container mx-auto px-4 py-8 pt-20">
+            <Routes>
+              <Route 
+                path="/"
+                element={
+                  <Plan 
+                    semestersData={semestersData} 
+                    setSemestersData={setSemestersData}
+                    userId={userId}
+                    semesterIds={semesterIds}
+                    courseIds={courseIds}
+                    setCourseIds={setCourseIds}
+                    onAddToSemester={handleAddToSemester}
+                  />
+                } 
+              />
+              <Route 
+                path="/explore" 
+                element={
+                  <Explore 
+                    semesters={Object.values(semestersData).map(({ id, name }) => ({ id, name }))}
+                    onAddToSemester={handleAddToSemester}
+                  />
+                } 
+              />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
+        </SignedIn>
+        <SignedOut>
           <Routes>
-            <Route 
-              path="/" 
-              element={
-                <Plan 
-                  semestersData={semestersData} 
-                  setSemestersData={setSemestersData}
-                  userId={userId}
-                  semesterIds={semesterIds}
-                  courseIds={courseIds}
-                  setCourseIds={setCourseIds}
-                  onAddToSemester={handleAddToSemester}
-                />
-              } 
-            />
-            <Route 
-              path="/explore" 
-              element={
-                <Explore 
-                  semesters={Object.values(semestersData).map(({ id, name }) => ({ id, name }))}
-                  onAddToSemester={handleAddToSemester}
-                />
-              } 
-            />
+          <Route path="/" element={<SignIn />} />
+            <Route path="/sign-in" element={<SignIn />} />
+            <Route path="/sign-up" element={<SignUp />} />
+            <Route path="*" element={<Navigate to="/sign-in" replace />} />
           </Routes>
-        </main>
-      </div>
+        </SignedOut>
+      </div> 
     </Router>
   );
 };
