@@ -57,6 +57,7 @@ interface PlanProps {
   courseIds: { [key: string]: number };
   setCourseIds: Dispatch<SetStateAction<{ [key: string]: number }>>;
   onAddToSemester: (course: CourseData, semesterId: string) => void;
+  isLoading?: boolean;
 }
 
 const Plan = ({ 
@@ -66,7 +67,8 @@ const Plan = ({
   semesterIds,
   courseIds,
   setCourseIds,
-  onAddToSemester
+  onAddToSemester,
+  isLoading = false
 }: PlanProps) => {
   const [isTrashHovered, setIsTrashHovered] = useState(false);
   const [draggedCourseId, setDraggedCourseId] = useState<string | null>(null);
@@ -334,6 +336,17 @@ const Plan = ({
     setDraggedCourseId(null);
     setIsTrashHovered(false);
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-gray-600 dark:text-gray-300 text-lg">Loading your course plan...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

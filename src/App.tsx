@@ -49,6 +49,7 @@ const App = () => {
   const { user } = useUser();
   const [semestersData, setSemestersData] = useState<SemestersData>({});
   const [loading, setLoading] = useState(true);
+  const [loading_semesters, setLoadingSemesters] = useState(true);
   // Add new state for storing IDs
   const [userId, setUserId] = useState<number | null>(null);
   const [semesterIds, setSemesterIds] = useState<SemesterIds>({});
@@ -102,7 +103,6 @@ const App = () => {
               
               // Store course IDs
               newCourseIds[courseDisplayId] = course.id;
-              
               return {
                 id: courseDisplayId,
                 subject: course.subject,
@@ -134,6 +134,7 @@ const App = () => {
         console.error('Error initializing user:', error);
       } finally {
         setLoading(false);
+        setLoadingSemesters(false);
       }
     };
 
@@ -236,6 +237,7 @@ const App = () => {
                     courseIds={courseIds}
                     setCourseIds={setCourseIds}
                     onAddToSemester={handleAddToSemester}
+                    isLoading={loading_semesters}
                   />
                 } 
               />
