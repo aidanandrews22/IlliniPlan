@@ -272,6 +272,18 @@ const Plan = ({
   };
 
   const removeSemester = (semesterId: string) => {
+    if (!userId) return;
+
+    // Queue the delete operation in the database
+    dbQueue.addOperation({
+      type: 'DELETE_SEMESTER',
+      payload: {
+        userId,
+        semesterId
+      }
+    });
+
+    // Update UI state
     setSemestersData(prev => {
       const newData = { ...prev };
       delete newData[semesterId];
