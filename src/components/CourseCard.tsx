@@ -12,6 +12,7 @@ import {
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import CourseDetailsModal from "./CourseDetailsModal";
 import type { CourseData, DisplayCourse } from "../types/database";
+import { getCourseGenEds } from "../lib/supabase";
 
 interface CourseCardProps extends DisplayCourse {
   isDragged: boolean;
@@ -39,6 +40,20 @@ const CourseCard = ({
   const coursecardRef = useRef<HTMLDivElement>(null);
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [courseGenEds, setCourseGenEds] = useState<CourseData['course_geneds']>(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchGenEds = async () => {
+      if (isModalOpen && databaseId) {
+        setLoading(true);
+        const genEds = await getCourseGenEds(databaseId);
+        setCourseGenEds(genEds);
+        setLoading(false);
+      }
+    };
+    fetchGenEds();
+  }, [isModalOpen, databaseId]);
 
   useEffect(() => {
     const coursecardEl = coursecardRef.current;
@@ -94,7 +109,7 @@ const CourseCard = ({
     credit_hours: creditHours,
     degree_attributes: degreeAttributes || null,
     section_info: null,
-    course_geneds: null,
+    course_geneds: courseGenEds,
     course_prereqs: null,
     course_offerings: terms.map((term, index) => {
       const [season, year] = term.split(' ');
@@ -119,10 +134,6 @@ const CourseCard = ({
       };
     })
   };
-
-  console.log("CourseCard - courseData:", courseData);
-  console.log("CourseCard - course_geneds:", courseData.course_geneds);
-  console.log("CourseCard - databaseId:", databaseId);
 
   return (
     <>
@@ -177,6 +188,7 @@ const CourseCard = ({
           course={courseData}
           onClose={() => setIsModalOpen(false)}
           showAddToSemester={false}
+          loading={loading}
         />
       )}
     </>

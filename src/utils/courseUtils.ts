@@ -63,18 +63,18 @@ interface GenEdInfo {
 }
 
 export const formatGenEds = (course: CourseData): GenEdInfo[] => {
-  console.log("formatGenEds - input course:", course);
-  console.log("formatGenEds - course_geneds:", course.course_geneds);
+  // console.log("formatGenEds - input course:", course);
+  // console.log("formatGenEds - course_geneds:", course.course_geneds);
   
   if (!course.course_geneds) {
-    console.log("formatGenEds - no course_geneds, returning empty array");
+    // console.log("formatGenEds - no course_geneds, returning empty array");
     return [];
   }
   const genEds: GenEdInfo[] = [];
   
   // Advanced Composition
   if (course.course_geneds.acp) {
-    console.log("formatGenEds - adding ACP");
+    // console.log("formatGenEds - adding ACP");
     genEds.push({
       code: 'ACP',
       description: genEdDescriptions['ACP'],
@@ -84,7 +84,7 @@ export const formatGenEds = (course: CourseData): GenEdInfo[] => {
 
   // Cultural Studies
   if (course.course_geneds.cs && course.course_geneds.cs !== 'False') {
-    console.log("formatGenEds - adding CS:", course.course_geneds.cs);
+    // console.log("formatGenEds - adding CS:", course.course_geneds.cs);
     genEds.push({
       code: course.course_geneds.cs as CSValue,
       description: genEdDescriptions[course.course_geneds.cs],
@@ -94,7 +94,7 @@ export const formatGenEds = (course: CourseData): GenEdInfo[] => {
 
   // Humanities
   if (course.course_geneds.hum && course.course_geneds.hum !== 'False') {
-    console.log("formatGenEds - adding HUM:", course.course_geneds.hum);
+    // console.log("formatGenEds - adding HUM:", course.course_geneds.hum);
     genEds.push({
       code: course.course_geneds.hum as HumValue,
       description: genEdDescriptions[course.course_geneds.hum],
@@ -104,7 +104,7 @@ export const formatGenEds = (course: CourseData): GenEdInfo[] => {
 
   // Natural Sciences
   if (course.course_geneds.nat && course.course_geneds.nat !== 'False') {
-    console.log("formatGenEds - adding NAT:", course.course_geneds.nat);
+    // console.log("formatGenEds - adding NAT:", course.course_geneds.nat);
     genEds.push({
       code: course.course_geneds.nat as NatValue,
       description: genEdDescriptions[course.course_geneds.nat],
@@ -114,7 +114,7 @@ export const formatGenEds = (course: CourseData): GenEdInfo[] => {
 
   // Quantitative Reasoning
   if (course.course_geneds.qr && course.course_geneds.qr !== 'False') {
-    console.log("formatGenEds - adding QR:", course.course_geneds.qr);
+    // console.log("formatGenEds - adding QR:", course.course_geneds.qr);
     genEds.push({
       code: course.course_geneds.qr as QRValue,
       description: genEdDescriptions[course.course_geneds.qr],
@@ -124,7 +124,7 @@ export const formatGenEds = (course: CourseData): GenEdInfo[] => {
 
   // Social Sciences
   if (course.course_geneds.sbs && course.course_geneds.sbs !== 'False') {
-    console.log("formatGenEds - adding SBS:", course.course_geneds.sbs);
+    // console.log("formatGenEds - adding SBS:", course.course_geneds.sbs);
     genEds.push({
       code: course.course_geneds.sbs as SBSValue,
       description: genEdDescriptions[course.course_geneds.sbs],
@@ -132,7 +132,7 @@ export const formatGenEds = (course: CourseData): GenEdInfo[] => {
     });
   }
   
-  console.log("formatGenEds - final result:", genEds);
+  // console.log("formatGenEds - final result:", genEds);
   return genEds;
 };
 

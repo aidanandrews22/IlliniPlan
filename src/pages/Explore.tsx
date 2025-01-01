@@ -184,8 +184,11 @@ const Explore = ({ semesters, onAddToSemester }: ExploreProps) => {
       </div>
 
       {loading && courses.length === 0 ? (
-        <div className="flex justify-center items-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100" />
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+            <p className="text-gray-600 dark:text-gray-300 text-lg">Loading your courses...</p>
+          </div>
         </div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -195,6 +198,7 @@ const Explore = ({ semesters, onAddToSemester }: ExploreProps) => {
               course={course}
               semesters={semesters}
               onAddToSemester={onAddToSemester}
+              loading={loading}
             />
           ))}
           {loading && courses.length > 0 && (

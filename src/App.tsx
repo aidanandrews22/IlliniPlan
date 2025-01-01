@@ -17,6 +17,7 @@ import {
 import { SignedIn, SignedOut } from '@clerk/clerk-react';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
+import Settings from './pages/Settings';
 
 // Add interfaces for storing IDs
 interface SemesterIds {
@@ -216,7 +217,14 @@ const App = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-gray-600 dark:text-gray-300 text-lg">Loading your IlliniPlan...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -249,6 +257,10 @@ const App = () => {
                     onAddToSemester={handleAddToSemester}
                   />
                 } 
+              />
+              <Route 
+                path="/settings"
+                element={<Settings />}
               />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

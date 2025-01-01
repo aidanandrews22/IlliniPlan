@@ -8,12 +8,12 @@ interface CourseExplorerCardProps {
   course: CourseData;
   semesters?: { id: string; name: string; }[];
   onAddToSemester?: (courseData: CourseData, semesterId: string) => void;
+  loading?: boolean | undefined;
 }
 
-const CourseExplorerCard = ({ course, semesters, onAddToSemester }: CourseExplorerCardProps) => {
+const CourseExplorerCard = ({ course, semesters, onAddToSemester, loading }: CourseExplorerCardProps) => {
   const [isSemesterSelectorOpen, setIsSemesterSelectorOpen] = useState(false);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
-
   const handleSemesterSelect = (semesterId: string) => {
     if (onAddToSemester) {
       onAddToSemester(course, semesterId);
@@ -155,6 +155,7 @@ const CourseExplorerCard = ({ course, semesters, onAddToSemester }: CourseExplor
           onClose={() => setIsDetailsModalOpen(false)}
           onAddToSemester={() => setIsSemesterSelectorOpen(true)}
           showAddToSemester={Boolean(semesters && onAddToSemester)}
+          loading={loading}
         />
       )}
     </>

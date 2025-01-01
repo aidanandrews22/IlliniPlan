@@ -6,12 +6,13 @@ interface CourseDetailsModalProps {
   onClose: () => void;
   onAddToSemester?: () => void;
   showAddToSemester?: boolean;
+  loading?: boolean | undefined;
 }
 
-const CourseDetailsModal = ({ course, onClose, onAddToSemester, showAddToSemester }: CourseDetailsModalProps) => {
+const CourseDetailsModal = ({ course, onClose, onAddToSemester, showAddToSemester, loading }: CourseDetailsModalProps) => {
   const averageGPA = getLatestTermGPA(course);
   const genEds = formatGenEds(course);
-  console.log("genEds: ", genEds);
+  // console.log("genEds: ", genEds);
   const formattedTerms = formatTerms(course);
   const creditHours = formatCreditHours(course.credit_hours);
 
@@ -23,6 +24,28 @@ const CourseDetailsModal = ({ course, onClose, onAddToSemester, showAddToSemeste
     acc[genEd.category].push(genEd);
     return acc;
   }, {} as Record<string, typeof genEds>);
+
+  if (loading) {
+    return (
+      <div 
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            onClose();
+          }
+        }}
+      >
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="flex flex-col items-center space-y-4">
+              <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+                <p className="text-gray-600 dark:text-gray-300 text-lg">Loading your courses details...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
