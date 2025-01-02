@@ -25,7 +25,9 @@ const genEdDescriptions: Record<string, string> = {
 
 export const formatCreditHours = (hours: string | null) => {
   if (!hours) return 'N/A';
-  return hours.toLowerCase().replace(' hours', '').replace(' to ', '-');
+  // Strip all characters except numbers and decimal points, then add 'hours' suffix
+  const cleanHours = hours.replace(/[^\d]/g, '');
+  return `${cleanHours} hours`;
 };
 
 export const getLatestTermGPA = (course: CourseData) => {

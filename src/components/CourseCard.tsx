@@ -176,7 +176,7 @@ const CourseCard = ({
                 ? 'text-red-500 dark:text-red-400' 
                 : 'text-primary dark:text-primary'
             }`}>
-              {creditHours}
+              {creditHours?.replace(/[^\d.]/g, '').split('.')[0]} hrs
             </span>
           </div>
         </div>
