@@ -63,7 +63,7 @@ const Semester = ({
     <div 
       ref={semesterRef}
       className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 transition-all duration-200 ${
-        isDraggedOver ? 'ring-2 ring-blue-500 ring-opacity-50' : ''
+        isDraggedOver ? 'ring-2 ring-primary ring-opacity-50' : ''
       } ${completed ? 'bg-gray-100 dark:bg-gray-900' : ''}`}
     >
       <div className="p-4 border-b border-gray-200 dark:border-gray-700">
@@ -117,7 +117,7 @@ const Semester = ({
       <div className="p-4 pt-0">
         <button
           onClick={onAddCourse}
-          className="w-full py-2 px-4 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors duration-200 flex items-center justify-center space-x-2"
+          className="w-full py-2 px-4 bg-primary/10 text-primary dark:text-primary rounded-lg hover:bg-primary/20 transition-colors duration-200 flex items-center justify-center space-x-2"
         >
           <span>Add Course</span>
         </button>

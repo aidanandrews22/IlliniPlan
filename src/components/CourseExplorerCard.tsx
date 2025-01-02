@@ -52,7 +52,7 @@ const CourseExplorerCard = ({ course, semesters, onAddToSemester, loading }: Cou
               </p>
             </div>
             <div className="flex flex-col items-end gap-2">
-              <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium">
+              <span className="px-3 py-1 bg-primary/10 text-primary dark:text-primary rounded-full text-sm font-medium">
                 {creditHours}
               </span>
               {averageGPA && (
@@ -132,7 +132,7 @@ const CourseExplorerCard = ({ course, semesters, onAddToSemester, loading }: Cou
                   e.stopPropagation();
                   setIsSemesterSelectorOpen(true);
                 }}
-                className="w-full py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+                className="w-full py-2 px-4 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
               >
                 <span>Add to Semester</span>
               </button>

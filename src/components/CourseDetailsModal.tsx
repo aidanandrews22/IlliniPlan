@@ -268,7 +268,7 @@ const CourseDetailsModal = ({ course, onClose, onAddToSemester, showAddToSemeste
               <div className="mb-4">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">GPA Data</h3>
                 <p className="text-xs text-gray-700 dark:text-gray-300 mb-2">
-                  Same data used by Wade Fagan's <a href="https://waf.cs.illinois.edu/discovery/grade_disparity_between_sections_at_uiuc/" target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:underline">grade disparity</a> tool.
+                  Same data used by Wade Fagan's <a href="https://waf.cs.illinois.edu/discovery/grade_disparity_between_sections_at_uiuc/" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">grade disparity</a> tool.
                 </p>
                 <label htmlFor="term-select" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   Select Term
@@ -277,7 +277,7 @@ const CourseDetailsModal = ({ course, onClose, onAddToSemester, showAddToSemeste
                   id="term-select"
                   value={selectedTermId || ''}
                   onChange={(e) => setSelectedTermId(Number(e.target.value))}
-                  className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-gray-100"
+                  className="w-full px-3 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-gray-900 dark:text-gray-100"
                 >
                   {availableTerms.map(term => (
                     <option key={term!.id} value={term!.id}>
@@ -305,7 +305,7 @@ const CourseDetailsModal = ({ course, onClose, onAddToSemester, showAddToSemeste
                       <div className="w-8 text-right text-gray-700 dark:text-gray-300">{gradeData.count}</div>
                       <div className="flex-1 h-4 bg-gray-100 dark:bg-gray-700 rounded overflow-hidden">
                         <div
-                          className="h-full bg-blue-500 dark:bg-blue-600 rounded transition-all duration-300"
+                          className="h-full bg-primary dark:bg-primary/80 rounded transition-all duration-300"
                           style={{ width: `${getGradeBarWidth(gradeData.count, getTotalStudents(data.grades))}%` }}
                         />
                       </div>
@@ -326,7 +326,7 @@ const CourseDetailsModal = ({ course, onClose, onAddToSemester, showAddToSemeste
                     onClose();
                     onAddToSemester?.();
                   }}
-                  className="w-full py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
+                  className="w-full py-2 px-4 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors duration-200 flex items-center justify-center space-x-2"
                 >
                   <span>Add to Semester</span>
                 </button>

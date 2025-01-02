@@ -146,7 +146,7 @@ const CourseCard = ({
       <div 
         ref={coursecardRef}
         className={`relative border rounded-lg shadow-sm transition-all duration-200 ${
-          isDragged ? 'opacity-50 cursor-grabbing' : 'cursor-pointer hover:border-blue-500 dark:hover:border-blue-400'
+          isDragged ? 'opacity-50 cursor-grabbing' : 'cursor-pointer hover:border-primary dark:hover:border-primary'
         } ${
           isTrashHovered 
             ? 'bg-red-50 dark:bg-red-900/20 border-red-500 shadow-md' 
@@ -174,7 +174,7 @@ const CourseCard = ({
             <span className={`text-sm font-medium transition-colors duration-200 ${
               isTrashHovered 
                 ? 'text-red-500 dark:text-red-400' 
-                : 'text-blue-600 dark:text-blue-400'
+                : 'text-primary dark:text-primary'
             }`}>
               {creditHours}
             </span>
@@ -182,7 +182,7 @@ const CourseCard = ({
         </div>
         {closestEdge && (
           <div 
-            className={`absolute left-0 right-0 h-0.5 bg-blue-500 transform transition-transform duration-200 ${
+            className={`absolute left-0 right-0 h-0.5 bg-primary transform transition-transform duration-200 ${
               closestEdge === 'top' ? '-top-px' : '-bottom-px'
             }`}
           />

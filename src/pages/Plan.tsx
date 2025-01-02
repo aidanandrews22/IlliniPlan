@@ -400,28 +400,40 @@ const Plan = ({
         </div>
         <button
           onClick={() => setIsNewSemesterModalOpen(true)}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors duration-200"
+          className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors duration-200"
         >
           Add Semester
         </button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {Object.values(semestersData).map((semester) => (
-          <Semester
-            key={semester.id}
-            {...semester}
-            onRemove={() => removeSemester(semester.id)}
-            onToggleComplete={() => toggleSemesterCompletion(semester.id)}
-            onAddCourse={() => handleAddCourse(semester.id)}
-            onRemoveCourse={(courseId) => removeCourse(semester.id, courseId)}
-            draggedCourseId={draggedCourseId}
-            isTrashHovered={isTrashHovered}
-            onDragStart={handleDragStart}
-            onDragEnd={handleDragEnd}
-            courseIds={courseIds}
-          />
-        ))}
-      </div>
+      {Object.keys(semestersData).length === 0 ? (
+        <div className="flex flex-col items-center justify-center p-8 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-4">
+          <p className="text-lg text-gray-600 dark:text-gray-300">You haven't added any semesters yet.</p>
+          <button
+            onClick={() => setIsNewSemesterModalOpen(true)}
+            className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors duration-200"
+          >
+            Add Your First Semester
+          </button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {Object.values(semestersData).map((semester) => (
+            <Semester
+              key={semester.id}
+              {...semester}
+              onRemove={() => removeSemester(semester.id)}
+              onToggleComplete={() => toggleSemesterCompletion(semester.id)}
+              onAddCourse={() => handleAddCourse(semester.id)}
+              onRemoveCourse={(courseId) => removeCourse(semester.id, courseId)}
+              draggedCourseId={draggedCourseId}
+              isTrashHovered={isTrashHovered}
+              onDragStart={handleDragStart}
+              onDragEnd={handleDragEnd}
+              courseIds={courseIds}
+            />
+          ))}
+        </div>
+      )}
       <DegreeTotals semesters={Object.values(semestersData)} />
       
       {isNewSemesterModalOpen && (

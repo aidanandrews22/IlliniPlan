@@ -20,10 +20,10 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       signUpUrl="/sign-up"
       appearance={{
         baseTheme: window.matchMedia('(prefers-color-scheme: dark)').matches ? dark : undefined,
-        // variables: {
-        //   colorPrimary: '#E84A27',
-        //   colorTextOnPrimaryBackground: '#FFFFFF',
-        // }
+        variables: {
+          colorPrimary: '#E84A27',
+          colorTextOnPrimaryBackground: '#FFFFFF',
+        }
       }}
     >
       <App />

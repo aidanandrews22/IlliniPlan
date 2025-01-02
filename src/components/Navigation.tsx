@@ -41,7 +41,7 @@ const Navigation = () => {
                   to={item.path}
                   className={`px-4 py-2 rounded-lg transition-colors duration-200 ${
                     isCurrentPath(item.path)
-                      ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300'
+                      ? 'bg-primary/10 text-primary dark:text-primary'
                       : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
                   }`}
                 >
@@ -68,7 +68,7 @@ const Navigation = () => {
               to={item.path}
               className={`flex flex-col items-center justify-center py-2 rounded-lg transition-colors duration-200 ${
                 isCurrentPath(item.path)
-                  ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300'
+                  ? 'bg-primary/10 text-primary dark:text-primary'
                   : 'text-gray-600 dark:text-gray-400'
               }`}
             >
