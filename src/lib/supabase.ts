@@ -37,6 +37,12 @@ export async function searchCourses(query: string, page = 1, limit = 50, subject
   const start = (page - 1) * limit;
   const end = start + limit - 1;
 
+  // Strip punctuation and normalize whitespace
+  const sanitizedQuery = query.replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
+  
+  // Parse potential course code from query (e.g., "CS 124" or "CS124")
+  const courseCodeMatch = sanitizedQuery.match(/^([A-Za-z]+)\s*(\d+)$/);
+  
   let coursesQuery = supabase
     .from('courses')
     .select(`
@@ -55,9 +61,17 @@ export async function searchCourses(query: string, page = 1, limit = 50, subject
     coursesQuery = coursesQuery.eq('subject', subject);
   }
 
-  // Apply search query if provided
-  if (query && query !== '*') {
-    coursesQuery = coursesQuery.or(`subject.ilike.%${query}%,number.ilike.%${query}%,title.ilike.%${query}%`);
+  // If query matches course code pattern, try exact match first
+  if (courseCodeMatch) {
+    const [, querySubject, queryNumber] = courseCodeMatch;
+    coursesQuery = coursesQuery.or(
+      `and(subject.ilike.${querySubject},number.eq.${queryNumber}),` +
+      `subject.ilike.%${sanitizedQuery}%,number.ilike.%${sanitizedQuery}%,title.ilike.%${sanitizedQuery}%`
+    );
+  } 
+  // Otherwise use the original fuzzy search
+  else if (sanitizedQuery && sanitizedQuery !== '*') {
+    coursesQuery = coursesQuery.or(`subject.ilike.%${sanitizedQuery}%,number.ilike.%${sanitizedQuery}%,title.ilike.%${sanitizedQuery}%`);
   }
 
   const { data, error } = await coursesQuery
@@ -70,6 +84,23 @@ export async function searchCourses(query: string, page = 1, limit = 50, subject
     return { data: [], count: 0 };
   }
 
+  // If we found an exact match, move it to the top of the results
+  if (courseCodeMatch && data) {
+    const [, querySubject, queryNumber] = courseCodeMatch;
+    const exactMatch = data.find(
+      course => {
+        const sanitizedSubject = course.subject.replace(/[^\w\s]/g, '').trim();
+        const sanitizedNumber = course.number.replace(/[^\w\s]/g, '').trim();
+        return sanitizedSubject.toLowerCase() === querySubject.toLowerCase() && 
+               sanitizedNumber === queryNumber;
+      }
+    );
+    if (exactMatch) {
+      const otherResults = data.filter(course => course.id !== exactMatch.id);
+      data.splice(0, data.length, exactMatch, ...otherResults);
+    }
+  }
+
   let countQuery = supabase
     .from('courses')
     .select('*', { count: 'exact', head: true });
@@ -79,8 +110,14 @@ export async function searchCourses(query: string, page = 1, limit = 50, subject
     countQuery = countQuery.eq('subject', subject);
   }
 
-  if (query && query !== '*') {
-    countQuery = countQuery.or(`subject.ilike.%${query}%,number.ilike.%${query}%,title.ilike.%${query}%`);
+  if (courseCodeMatch) {
+    const [, querySubject, queryNumber] = courseCodeMatch;
+    countQuery = countQuery.or(
+      `and(subject.ilike.${querySubject},number.eq.${queryNumber}),` +
+      `subject.ilike.%${sanitizedQuery}%,number.ilike.%${sanitizedQuery}%,title.ilike.%${sanitizedQuery}%`
+    );
+  } else if (sanitizedQuery && sanitizedQuery !== '*') {
+    countQuery = countQuery.or(`subject.ilike.%${sanitizedQuery}%,number.ilike.%${sanitizedQuery}%,title.ilike.%${sanitizedQuery}%`);
   }
 
   const { count } = await countQuery;
