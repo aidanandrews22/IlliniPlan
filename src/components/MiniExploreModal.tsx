@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { searchCourses, getSubjects } from '../lib/supabase';
 import type { CourseData } from '../types/database';
 import type { Database } from '../types/supabase';
+import { useContainerInfiniteScroll } from '../hooks/useContainerInfiniteScroll';
 
 type Subject = Database['public']['Tables']['subjects']['Row'];
 
@@ -15,6 +16,7 @@ interface MiniExploreModalProps {
 const ITEMS_PER_PAGE = 20;
 
 const MiniExploreModal = ({ onClose, onSelectCourse, title = 'Add Course', semesterId }: MiniExploreModalProps) => {
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [courses, setCourses] = useState<CourseData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -87,6 +89,20 @@ const MiniExploreModal = ({ onClose, onSelectCourse, title = 'Add Course', semes
     }
   }, [loading, courses.length, totalCount, page, searchQuery, selectedSubject]);
 
+  // Initialize infinite scroll
+  useContainerInfiniteScroll({
+    containerRef: scrollContainerRef,
+    onLoadMore: loadMore,
+    hasMore: courses.length < totalCount,
+  });
+
+  // Search handler
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+    setPage(1);
+    setCourses([]);
+  };
+
   return (
     <div 
       className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50"
@@ -117,7 +133,7 @@ const MiniExploreModal = ({ onClose, onSelectCourse, title = 'Add Course', semes
                 type="text"
                 placeholder="Search courses by keywords..."
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={handleSearchChange}
                 className="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-primary focus:border-primary"
               />
             </div>
@@ -173,7 +189,7 @@ const MiniExploreModal = ({ onClose, onSelectCourse, title = 'Add Course', semes
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-6">
+        <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-6">
           {loading && courses.length === 0 ? (
             <div className="flex justify-center items-center h-32">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100" />
@@ -206,6 +222,11 @@ const MiniExploreModal = ({ onClose, onSelectCourse, title = 'Add Course', semes
                   </p>
                 </div>
               ))}
+              {loading && courses.length > 0 && (
+                <div className="flex justify-center py-4">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100" />
+                </div>
+              )}
             </div>
           )}
         </div>
