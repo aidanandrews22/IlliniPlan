@@ -46,4 +46,21 @@ export interface UserData {
     startYear: number;
     anticipatedGraduation: number;
   };
+}
+
+export interface PrereqLogic {
+  and?: (PrereqLogic | string)[];
+  or?: (PrereqLogic | string)[];
+}
+
+export interface CourseRelationships {
+  prerequisites: string[];  // Courses that are prerequisites for this course
+  postrequisites: string[]; // Courses that this course is a prerequisite for
+  corequisites: string[];  // Courses that must be taken concurrently
+}
+
+export interface CourseHighlightState {
+  isPrereq: boolean;      // This course is a prerequisite for the hovered course
+  isPostreq: boolean;     // This course has the hovered course as a prerequisite
+  isCoreq: boolean;       // This course is a corequisite with the hovered course
 } 

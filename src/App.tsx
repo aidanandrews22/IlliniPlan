@@ -18,6 +18,7 @@ import { SignedIn, SignedOut } from '@clerk/clerk-react';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
 import Settings from './pages/Settings';
+import { supabase } from './lib/supabase';
 
 // Add interfaces for storing IDs
 interface SemesterIds {
@@ -46,6 +47,16 @@ type SemesterPlan = Database['public']['Tables']['semester_plans']['Row'] & {
   semester_plan_courses: SemesterPlanCourse[];
 };
 
+interface PrereqData {
+  courseId: number;
+  prereqLogic: any;
+}
+
+interface PrereqRow {
+  course_id: number;
+  prereq_logic: any;
+}
+
 const App = () => {
   const { user } = useUser();
   const [semestersData, setSemestersData] = useState<SemestersData>({});
@@ -55,6 +66,7 @@ const App = () => {
   const [userId, setUserId] = useState<number | null>(null);
   const [semesterIds, setSemesterIds] = useState<SemesterIds>({});
   const [courseIds, setCourseIds] = useState<CourseIds>({});
+  const [coursePrereqs, setCoursePrereqs] = useState<PrereqData[]>([]);
 
   useEffect(() => {
     const initializeUser = async () => {
@@ -141,6 +153,39 @@ const App = () => {
 
     initializeUser();
   }, [user]);
+
+  useEffect(() => {
+    const fetchPrereqs = async () => {
+      if (!user) return;
+
+      try {
+        // Get all course IDs from the courseIds mapping
+        const courseIdList = Object.values(courseIds);
+        if (courseIdList.length === 0) return;
+
+        const { data: prereqData, error } = await supabase
+          .from('course_prereqs')
+          .select('course_id, prereq_logic')
+          .in('course_id', courseIdList);
+
+        if (error) {
+          console.error('Error fetching prerequisites:', error);
+          return;
+        }
+
+        setCoursePrereqs(
+          (prereqData as PrereqRow[]).map(row => ({
+            courseId: row.course_id,
+            prereqLogic: row.prereq_logic
+          }))
+        );
+      } catch (error) {
+        console.error('Error in fetchPrereqs:', error);
+      }
+    };
+
+    fetchPrereqs();
+  }, [user, courseIds]);
 
   const handleAddToSemester = async (course: CourseData, semesterId: string) => {
     if (!user) return;
@@ -254,6 +299,7 @@ const App = () => {
                     setCourseIds={setCourseIds}
                     onAddToSemester={handleAddToSemester}
                     isLoading={loading_semesters}
+                    coursePrereqs={coursePrereqs}
                   />
                 } 
               />

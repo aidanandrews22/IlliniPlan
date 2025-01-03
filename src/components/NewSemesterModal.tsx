@@ -8,7 +8,7 @@ interface NewSemesterModalProps {
 
 const TERMS = ['Fall', 'Spring', 'Summer', 'Winter'];
 const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = Array.from({ length: 6 }, (_, i) => CURRENT_YEAR + i);
+const YEARS = Array.from({ length: 6 }, (_, i) => (CURRENT_YEAR - 4) + i);
 
 const NewSemesterModal = ({ onClose, onSubmit, existingSemesters }: NewSemesterModalProps) => {
   const [selectedTerm, setSelectedTerm] = useState(TERMS[0]);

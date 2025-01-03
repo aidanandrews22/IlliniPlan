@@ -1,4 +1,4 @@
-import type { CourseData } from '../types/database';
+import type { CourseData, PrereqLogic, CourseRelationships } from '../types/database';
 
 // Gen Ed type definitions
 type CSValue = 'US' | 'NW' | 'WCC' | 'False';
@@ -149,4 +149,84 @@ export const formatTerms = (course: CourseData) => {
     }[offering.terms.season] || offering.terms.season.toUpperCase();
     return `${seasonName} ${offering.terms.year}`;
   });
+};
+
+// Flattens a prerequisite logic tree into a list of course codes
+export const flattenPrereqLogic = (logic: PrereqLogic | string): string[] => {
+  if (typeof logic === 'string') {
+    return [logic];
+  }
+
+  const courses: string[] = [];
+  
+  if (logic.and) {
+    logic.and.forEach(item => {
+      courses.push(...flattenPrereqLogic(item));
+    });
+  }
+  
+  if (logic.or) {
+    logic.or.forEach(item => {
+      courses.push(...flattenPrereqLogic(item));
+    });
+  }
+
+  return [...new Set(courses)]; // Remove duplicates
+};
+
+// Formats a course into a standard code format (e.g., "CS 225")
+export const formatCourseCode = (subject: string, number: string): string => {
+  return `${subject} ${number}`;
+};
+
+// Builds a map of course relationships from the prerequisite data
+export const buildCourseRelationships = (
+  courses: { id: string; subject: string; number: string }[],
+  prereqData: { courseId: number; prereqLogic: PrereqLogic | null }[]
+): Map<string, CourseRelationships> => {
+  const relationships = new Map<string, CourseRelationships>();
+  
+  // Initialize relationships for all courses
+  courses.forEach(course => {
+    relationships.set(formatCourseCode(course.subject, course.number), {
+      prerequisites: [],
+      postrequisites: [],
+      corequisites: [] // We'll handle coreqs later if needed
+    });
+  });
+
+  // Process prerequisites
+  prereqData.forEach(({ courseId, prereqLogic }) => {
+    if (!prereqLogic) return;
+
+    const course = courses.find(c => courseId.toString() === c.id);
+    if (!course) return;
+
+    const courseCode = formatCourseCode(course.subject, course.number);
+    const prereqs = flattenPrereqLogic(prereqLogic);
+
+    // Update relationships
+    const courseRels = relationships.get(courseCode) || {
+      prerequisites: [],
+      postrequisites: [],
+      corequisites: []
+    };
+    courseRels.prerequisites = prereqs;
+    relationships.set(courseCode, courseRels);
+
+    // Update postrequisites for prerequisite courses
+    prereqs.forEach(prereq => {
+      const prereqRels = relationships.get(prereq) || {
+        prerequisites: [],
+        postrequisites: [],
+        corequisites: []
+      };
+      if (!prereqRels.postrequisites.includes(courseCode)) {
+        prereqRels.postrequisites.push(courseCode);
+      }
+      relationships.set(prereq, prereqRels);
+    });
+  });
+
+  return relationships;
 }; 

@@ -18,13 +18,13 @@ export async function searchCoursesHelper(query: string, page = 1, limit = 50, s
     // Strip punctuation and normalize whitespace
     const sanitizedQuery = query.replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
     
-    console.log('Search parameters:', {
-        sanitizedQuery,
-        subject,
-        page,
-        limit,
-        start
-    });
+    // console.log('Search parameters:', {
+    //     sanitizedQuery,
+    //     subject,
+    //     page,
+    //     limit,
+    //     start
+    // });
 
     try {
         // First get the ranked results from our search function
@@ -41,18 +41,18 @@ export async function searchCoursesHelper(query: string, page = 1, limit = 50, s
             return { data: [], count: 0 };
         }
 
-        console.log('Initial search results:', {
-            resultCount: rankedResults?.length || 0,
-            firstResult: rankedResults?.[0],
-            lastResult: rankedResults?.[rankedResults?.length - 1]
-        });
+        // console.log('Initial search results:', {
+        //     resultCount: rankedResults?.length || 0,
+        //     firstResult: rankedResults?.[0],
+        //     lastResult: rankedResults?.[rankedResults?.length - 1]
+        // });
 
         // Extract the total count and course IDs
         const count = (rankedResults as CourseSearchResult[])?.[0]?.total_count || 0;
         const courseIds = (rankedResults as CourseSearchResult[]).map(course => course.id);
         
         if (courseIds.length === 0) {
-            console.log('No course IDs found, returning empty result');
+            // console.log('No course IDs found, returning empty result');
             return { data: [], count };
         }
 
@@ -94,10 +94,10 @@ export async function searchCoursesHelper(query: string, page = 1, limit = 50, s
             processedData?.find(course => course.id === id)
         ).filter(Boolean);
 
-        console.log('Final results:', {
-            sortedResultsCount: sortedResults.length,
-            firstSortedResult: sortedResults[0]
-        });
+        // console.log('Final results:', {
+        //     sortedResultsCount: sortedResults.length,
+        //     firstSortedResult: sortedResults[0]
+        // });
 
         return { 
             data: sortedResults || [], 

@@ -4,13 +4,14 @@ import { getReorderDestinationIndex } from "@atlaskit/pragmatic-drag-and-drop-hi
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { reorder } from "@atlaskit/pragmatic-drag-and-drop/reorder";
 import { dbQueue } from '../utils/dbQueue';
+import { buildCourseRelationships, formatCourseCode } from '../utils/courseUtils';
 
 import Semester from "../components/Semester";
 import DegreeTotals from '../components/DegreeTotals';
 import TrashZone from '../components/TrashZone';
 import NewSemesterModal from '../components/NewSemesterModal';
 import MiniExploreModal from '../components/MiniExploreModal';
-import type { CourseData } from '../types/database';
+import type { CourseData, CourseHighlightState, CourseRelationships } from '../types/database';
 
 interface DragData {
   type: string;
@@ -58,6 +59,7 @@ interface PlanProps {
   setCourseIds: Dispatch<SetStateAction<{ [key: string]: number }>>;
   onAddToSemester: (course: CourseData, semesterId: string) => void;
   isLoading?: boolean;
+  coursePrereqs?: { courseId: number; prereqLogic: any }[];
 }
 
 const Plan = ({ 
@@ -68,13 +70,16 @@ const Plan = ({
   courseIds,
   setCourseIds,
   onAddToSemester,
-  isLoading = false
+  isLoading = false,
+  coursePrereqs = []
 }: PlanProps) => {
   const [isTrashHovered, setIsTrashHovered] = useState(false);
   const [draggedCourseId, setDraggedCourseId] = useState<string | null>(null);
   const [isNewSemesterModalOpen, setIsNewSemesterModalOpen] = useState(false);
   const [isAddCourseModalOpen, setIsAddCourseModalOpen] = useState(false);
   const [selectedSemesterId, setSelectedSemesterId] = useState<string | null>(null);
+  const [courseRelationships, setCourseRelationships] = useState<Map<string, CourseRelationships>>(new Map());
+  const [courseHighlights, setCourseHighlights] = useState<Map<string, CourseHighlightState>>(new Map());
 
   const moveCourseCard = useCallback(({
     movedCourseCardIndexInSourceSemester,
@@ -376,6 +381,61 @@ const Plan = ({
     setIsTrashHovered(false);
   };
 
+  // Update course relationships when courses change
+  useEffect(() => {
+    const allCourses = Object.values(semestersData).flatMap(semester => 
+      semester.coursecards.map(course => ({
+        id: courseIds[course.id]?.toString() || '',
+        subject: course.subject,
+        number: course.number
+      }))
+    );
+
+    const relationships = buildCourseRelationships(allCourses, coursePrereqs);
+    setCourseRelationships(relationships);
+  }, [semestersData, courseIds, coursePrereqs]);
+
+  const handleCourseHover = (hoveredCourseCode: string | null) => {
+    if (!hoveredCourseCode) {
+      setCourseHighlights(new Map());
+      return;
+    }
+
+    const newHighlights = new Map<string, CourseHighlightState>();
+    const relationships = courseRelationships.get(hoveredCourseCode);
+
+    if (relationships) {
+      // Set highlights for prerequisites
+      relationships.prerequisites.forEach(prereq => {
+        newHighlights.set(prereq, {
+          isPrereq: true,
+          isPostreq: false,
+          isCoreq: false
+        });
+      });
+
+      // Set highlights for postrequisites
+      relationships.postrequisites.forEach(postreq => {
+        newHighlights.set(postreq, {
+          isPrereq: false,
+          isPostreq: true,
+          isCoreq: false
+        });
+      });
+
+      // Set highlights for corequisites
+      relationships.corequisites.forEach(coreq => {
+        newHighlights.set(coreq, {
+          isPrereq: false,
+          isPostreq: false,
+          isCoreq: true
+        });
+      });
+    }
+
+    setCourseHighlights(newHighlights);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -430,6 +490,8 @@ const Plan = ({
               onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
               courseIds={courseIds}
+              courseHighlights={courseHighlights}
+              onCourseHover={handleCourseHover}
             />
           ))}
         </div>

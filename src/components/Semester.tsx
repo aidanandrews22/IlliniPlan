@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import invariant from "tiny-invariant";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import CourseCard from "./CourseCard";
-import type { DisplayCourse } from "../types/database";
+import type { DisplayCourse, CourseHighlightState } from "../types/database";
 
 interface SemesterProps {
   id: string;
@@ -18,6 +18,8 @@ interface SemesterProps {
   onDragStart: (courseId: string) => void;
   onDragEnd: () => void;
   courseIds?: { [key: string]: number };
+  courseHighlights?: Map<string, CourseHighlightState>;
+  onCourseHover?: (courseCode: string | null) => void;
 }
 
 const Semester = ({ 
@@ -33,7 +35,9 @@ const Semester = ({
   isTrashHovered,
   onDragStart,
   onDragEnd,
-  courseIds = {}
+  courseIds = {},
+  courseHighlights = new Map(),
+  onCourseHover
 }: SemesterProps) => {
   const semesterRef = useRef<HTMLDivElement>(null);
   const [isDraggedOver, setIsDraggedOver] = useState(false);
@@ -106,6 +110,8 @@ const Semester = ({
             onDragStart={() => onDragStart(course.id)}
             onDragEnd={onDragEnd}
             databaseId={courseIds[course.id]}
+            highlightState={courseHighlights.get(`${course.subject} ${course.number}`)}
+            onHover={onCourseHover}
           />
         ))}
         {coursecards.length === 0 && (

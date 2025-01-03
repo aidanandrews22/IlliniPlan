@@ -11,8 +11,9 @@ import {
   Edge 
 } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import CourseDetailsModal from "./CourseDetailsModal";
-import type { CourseData, DisplayCourse } from "../types/database";
+import type { CourseData, DisplayCourse, CourseHighlightState } from "../types/database";
 import { getCourseGenEds, getCourseGPAs } from "../lib/supabase";
+import { formatCourseCode } from '../utils/courseUtils';
 
 interface CourseCardProps extends DisplayCourse {
   isDragged: boolean;
@@ -20,6 +21,8 @@ interface CourseCardProps extends DisplayCourse {
   onDragStart: () => void;
   onDragEnd: () => void;
   databaseId?: number;
+  highlightState?: CourseHighlightState;
+  onHover?: (courseCode: string | null) => void;
 }
 
 const CourseCard = ({ 
@@ -35,7 +38,9 @@ const CourseCard = ({
   isTrashHovered,
   onDragStart,
   onDragEnd,
-  databaseId
+  databaseId,
+  highlightState = { isPrereq: false, isPostreq: false, isCoreq: false },
+  onHover
 }: CourseCardProps) => {
   const coursecardRef = useRef<HTMLDivElement>(null);
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
@@ -141,17 +146,39 @@ const CourseCard = ({
     })
   };
 
+  // Add highlight classes based on state
+  const getHighlightClasses = () => {
+    if (highlightState.isPrereq) return 'ring-2 ring-red-500 dark:ring-red-400';
+    if (highlightState.isPostreq) return 'ring-2 ring-green-500 dark:ring-green-400';
+    if (highlightState.isCoreq) return 'ring-2 ring-blue-500 dark:ring-blue-400';
+    return '';
+  };
+
+  const handleMouseEnter = () => {
+    if (onHover) {
+      onHover(formatCourseCode(subject, number));
+    }
+  };
+
+  const handleMouseLeave = () => {
+    if (onHover) {
+      onHover(null);
+    }
+  };
+
   return (
     <>
       <div 
         ref={coursecardRef}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
         className={`relative border rounded-lg shadow-sm transition-all duration-200 ${
           isDragged ? 'opacity-50 cursor-grabbing' : 'cursor-pointer hover:border-primary dark:hover:border-primary'
         } ${
           isTrashHovered 
             ? 'bg-red-50 dark:bg-red-900/20 border-red-500 shadow-md' 
             : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-md'
-        }`}
+        } ${getHighlightClasses()}`}
       >
         <div className="p-4">
           <div className="flex items-start justify-between">
