@@ -3,6 +3,7 @@ import invariant from "tiny-invariant";
 import { dropTargetForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
 import CourseCard from "./CourseCard";
 import type { DisplayCourse, CourseHighlightState } from "../types/database";
+import { dbQueue } from "../utils/dbQueue";
 
 interface SemesterProps {
   id: string;
@@ -20,6 +21,7 @@ interface SemesterProps {
   courseIds?: { [key: string]: number };
   courseHighlights?: Map<string, CourseHighlightState>;
   onCourseHover?: (courseCode: string | null) => void;
+  userId?: number;
 }
 
 const Semester = ({ 
@@ -37,10 +39,25 @@ const Semester = ({
   onDragEnd,
   courseIds = {},
   courseHighlights = new Map(),
-  onCourseHover
+  onCourseHover,
+  userId
 }: SemesterProps) => {
   const semesterRef = useRef<HTMLDivElement>(null);
   const [isDraggedOver, setIsDraggedOver] = useState(false);
+
+  const handleToggleComplete = () => {
+    if (userId) {
+      dbQueue.addOperation({
+        type: 'UPDATE_SEMESTER_COMPLETION',
+        payload: {
+          userId,
+          semesterId: id,
+          complete: !completed
+        }
+      });
+    }
+    onToggleComplete();
+  };
 
   // Calculate total credits
   const totalCredits = coursecards.reduce((total, course) => {
@@ -75,7 +92,7 @@ const Semester = ({
           <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">{name}</h2>
           <div className="flex items-center space-x-2">
             <button
-              onClick={onToggleComplete}
+              onClick={handleToggleComplete}
               className={`p-2 rounded-lg transition-colors duration-200 ${
                 completed 
                   ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' 

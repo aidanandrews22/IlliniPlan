@@ -6,11 +6,12 @@ import {
   removeCourseFromSemesterPlan,
   deleteSemesterPlan,
   parseSemesterId,
-  moveCourseInSemesterPlan
+  moveCourseInSemesterPlan,
+  updateSemesterPlanCompletion
 } from '../lib/supabase';
 
 interface DbOperation {
-  type: 'ADD_COURSE' | 'REMOVE_COURSE' | 'MOVE_COURSE' | 'DELETE_SEMESTER' | 'ADD_SEMESTER';
+  type: 'ADD_COURSE' | 'REMOVE_COURSE' | 'MOVE_COURSE' | 'DELETE_SEMESTER' | 'ADD_SEMESTER' | 'UPDATE_SEMESTER_COMPLETION';
   payload: any;
   retries?: number;
 }
@@ -37,6 +38,12 @@ interface MoveCoursePayload {
 interface SemesterPayload {
   userId: number;
   semesterId: string;
+}
+
+interface UpdateSemesterCompletionPayload {
+  userId: number;
+  semesterId: string;
+  complete: boolean;
 }
 
 interface SupabaseError {
@@ -79,6 +86,13 @@ class DbOperationQueue {
         }
         return `${operation.type}-${payload.semesterId}`;
       }
+      case 'UPDATE_SEMESTER_COMPLETION': {
+        const payload = operation.payload as UpdateSemesterCompletionPayload;
+        if (!payload.semesterId || !payload.userId || typeof payload.complete !== 'boolean') {
+          throw new Error('Invalid payload for UPDATE_SEMESTER_COMPLETION operation');
+        }
+        return `${operation.type}-${payload.semesterId}`;
+      }
       default:
         return `${operation.type}-${JSON.stringify(operation.payload)}`;
     }
@@ -109,6 +123,13 @@ class DbOperationQueue {
         const payload = operation.payload as SemesterPayload;
         if (!payload.semesterId || !payload.userId) {
           throw new Error(`Invalid payload for ${operation.type} operation`);
+        }
+        break;
+      }
+      case 'UPDATE_SEMESTER_COMPLETION': {
+        const payload = operation.payload as UpdateSemesterCompletionPayload;
+        if (!payload.semesterId || !payload.userId || typeof payload.complete !== 'boolean') {
+          throw new Error('Invalid payload for UPDATE_SEMESTER_COMPLETION operation');
         }
         break;
       }
@@ -182,6 +203,18 @@ class DbOperationQueue {
 
           // Create or get the semester plan
           await getOrCreateSemesterPlan(userId, semesterInfo.year, semesterInfo.season);
+          break;
+        }
+
+        case 'UPDATE_SEMESTER_COMPLETION': {
+          const { userId, semesterId, complete } = operation.payload as UpdateSemesterCompletionPayload;
+          const semesterInfo = parseSemesterId(semesterId);
+          if (!semesterInfo) throw new Error('Invalid semester ID');
+
+          const plan = await getOrCreateSemesterPlan(userId, semesterInfo.year, semesterInfo.season);
+          if (!plan) throw new Error('Failed to get/create semester plan');
+
+          await updateSemesterPlanCompletion(plan.id, complete);
           break;
         }
       }

@@ -638,3 +638,28 @@ export async function moveCourseInSemesterPlan(sourceSemesterPlanId: number, des
     return null;
   }
 }
+
+// Update semester plan completion status
+export async function updateSemesterPlanCompletion(semesterPlanId: number, complete: boolean) {
+  try {
+    const { data, error } = await supabase
+      .from('semester_plans')
+      .update({ 
+        complete,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', semesterPlanId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating semester plan completion:', error);
+      return null;
+    }
+
+    return data;
+  } catch (e) {
+    console.error('Unexpected error in updateSemesterPlanCompletion:', e);
+    return null;
+  }
+}

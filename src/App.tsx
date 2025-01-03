@@ -109,7 +109,7 @@ const App = () => {
           formattedSemesters[key] = {
             id: key,
             name: `${termInfo.season.charAt(0).toUpperCase() + termInfo.season.slice(1)} ${termInfo.year}`,
-            completed: false,
+            completed: plan.complete || false,
             coursecards: plan.semester_plan_courses.map((planCourse: SemesterPlanCourse) => {
               const course = planCourse.courses;
               const courseDisplayId = `${course.subject}${course.number}_${planCourse.id}`;

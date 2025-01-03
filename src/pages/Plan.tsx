@@ -308,6 +308,21 @@ const Plan = ({
   };
 
   const toggleSemesterCompletion = (semesterId: string) => {
+    if (!userId) return;
+
+    const currentCompleted = semestersData[semesterId].completed;
+
+    // Queue the completion status update in the database
+    dbQueue.addOperation({
+      type: 'UPDATE_SEMESTER_COMPLETION',
+      payload: {
+        userId,
+        semesterId,
+        complete: !currentCompleted
+      }
+    });
+
+    // Update UI state
     setSemestersData(prev => ({
       ...prev,
       [semesterId]: {
