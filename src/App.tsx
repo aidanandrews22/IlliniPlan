@@ -12,7 +12,8 @@ import {
   addCourseToSemesterPlan,
   initializeUserSemesterPlans,
   createSemesterPlan,
-  parseSemesterId
+  parseSemesterId,
+  getUserPreferences
 } from './lib/supabase';
 import { SignedIn, SignedOut } from '@clerk/clerk-react';
 import SignIn from './pages/SignIn';
@@ -67,6 +68,7 @@ const App = () => {
   const [semesterIds, setSemesterIds] = useState<SemesterIds>({});
   const [courseIds, setCourseIds] = useState<CourseIds>({});
   const [coursePrereqs, setCoursePrereqs] = useState<PrereqData[]>([]);
+  const [userPreferences, setUserPreferences] = useState<any>(null);
 
   useEffect(() => {
     const initializeUser = async () => {
@@ -84,6 +86,13 @@ const App = () => {
         }
 
         setUserId(dbUser.id);
+
+        // Load user preferences with correct defaults
+        const preferences = await getUserPreferences(dbUser.id);
+        // console.log('Loaded user preferences:', preferences);
+        const defaultPreferences = { ui: { grid: false, compact: false } };
+        // console.log('Default preferences if none exist:', defaultPreferences);
+        setUserPreferences(preferences || defaultPreferences);
 
         // Initialize semester plans for new users
         await initializeUserSemesterPlans(dbUser.id);
@@ -300,6 +309,7 @@ const App = () => {
                     onAddToSemester={handleAddToSemester}
                     isLoading={loading_semesters}
                     coursePrereqs={coursePrereqs}
+                    initialPreferences={userPreferences}
                   />
                 } 
               />

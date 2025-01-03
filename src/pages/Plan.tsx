@@ -5,6 +5,7 @@ import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/clo
 import { reorder } from "@atlaskit/pragmatic-drag-and-drop/reorder";
 import { dbQueue } from '../utils/dbQueue';
 import { buildCourseRelationships, formatCourseCode, getAllPrerequisites, getAllPostrequisites } from '../utils/courseUtils';
+import { updateUserPreferences } from '../lib/supabase';
 
 import Semester from "../components/Semester";
 import DegreeTotals from '../components/DegreeTotals';
@@ -60,6 +61,7 @@ interface PlanProps {
   onAddToSemester: (course: CourseData, semesterId: string) => void;
   isLoading?: boolean;
   coursePrereqs?: { courseId: number; prereqLogic: any }[];
+  initialPreferences?: { ui?: { grid?: boolean; compact?: boolean; } };
 }
 
 const SEASON_ORDER: Record<string, number> = {
@@ -82,7 +84,8 @@ const Plan = ({
   setCourseIds,
   onAddToSemester,
   isLoading = false,
-  coursePrereqs = []
+  coursePrereqs = [],
+  initialPreferences
 }: PlanProps) => {
   const [isTrashHovered, setIsTrashHovered] = useState(false);
   const [draggedCourseId, setDraggedCourseId] = useState<string | null>(null);
@@ -91,8 +94,43 @@ const Plan = ({
   const [selectedSemesterId, setSelectedSemesterId] = useState<string | null>(null);
   const [courseRelationships, setCourseRelationships] = useState<Map<string, CourseRelationships>>(new Map());
   const [courseHighlights, setCourseHighlights] = useState<Map<string, CourseHighlightState>>(new Map());
-  const [isCompactView, setIsCompactView] = useState(true);
+  const [isCompactView, setIsCompactView] = useState(false);
   const [isGridLayout, setIsGridLayout] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
+
+  // Update view settings when preferences change
+  useEffect(() => {
+    if (initialPreferences?.ui) {
+      setIsCompactView(initialPreferences.ui.compact ?? false);
+      setIsGridLayout(initialPreferences.ui.grid ?? false);
+      setHasInitialized(true);
+    }
+  }, [initialPreferences]);
+
+  // Log initial preferences and chosen values
+  // useEffect(() => {
+  //   console.log('Initial preferences received:', initialPreferences);
+  //   console.log('Chosen values:', {
+  //     isCompactView,
+  //     isGridLayout
+  //   });
+  // }, [initialPreferences, isCompactView, isGridLayout]);
+
+  // Update preferences when view settings change
+  useEffect(() => {
+    if (!userId || !hasInitialized) return;
+
+    const updatePrefs = async () => {
+      await updateUserPreferences(userId, {
+        ui: {
+          grid: isGridLayout,
+          compact: isCompactView
+        }
+      });
+    };
+
+    updatePrefs();
+  }, [isGridLayout, isCompactView, userId, hasInitialized]);
 
   const moveCourseCard = useCallback(({
     movedCourseCardIndexInSourceSemester,

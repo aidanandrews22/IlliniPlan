@@ -663,3 +663,48 @@ export async function updateSemesterPlanCompletion(semesterPlanId: number, compl
     return null;
   }
 }
+
+// User Preferences Management
+export async function updateUserPreferences(userId: number, preferences: any) {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .update({
+        preferences,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', userId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error updating user preferences:', error);
+      return null;
+    }
+
+    return data;
+  } catch (e) {
+    console.error('Unexpected error in updateUserPreferences:', e);
+    return null;
+  }
+}
+
+export async function getUserPreferences(userId: number) {
+  try {
+    const { data, error } = await supabase
+      .from('users')
+      .select('preferences')
+      .eq('id', userId)
+      .single();
+
+    if (error) {
+      console.error('Error fetching user preferences:', error);
+      return null;
+    }
+
+    return data?.preferences;
+  } catch (e) {
+    console.error('Unexpected error in getUserPreferences:', e);
+    return null;
+  }
+}
