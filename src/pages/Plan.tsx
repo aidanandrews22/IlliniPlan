@@ -552,7 +552,7 @@ const Plan = ({
             isHovered={isTrashHovered}
             onHoverChange={setIsTrashHovered}
           />
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 ml-6 text-sm border-l border-gray-200 dark:border-gray-700 pl-6">
             <button
               onClick={() => setIsCompactView(!isCompactView)}
               className={`p-2 rounded-lg transition-colors duration-200 ${
@@ -573,6 +573,23 @@ const Plan = ({
             >
               {isGridLayout ? '✓ Grid' : 'Grid'}
             </button>
+          </div>
+          <div className="flex items-center space-x-3 ml-6 text-sm border-l border-gray-200 dark:border-gray-700 pl-6">
+            <span className="font-medium text-gray-700 dark:text-gray-300">Legend:</span>
+            <div className="flex items-center space-x-3">
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 rounded border-2 border-green-500 dark:border-green-400" />
+                <span className="text-gray-600 dark:text-gray-400">Postrequisite</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 rounded border-2 border-red-500 dark:border-red-400" />
+                <span className="text-gray-600 dark:text-gray-400">Prerequisite</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <div className="w-4 h-4 rounded border-2 border-blue-500 dark:border-blue-400" />
+                <span className="text-gray-600 dark:text-gray-400">Corequisite</span>
+              </div>
+            </div>
           </div>
         </div>
         <button
