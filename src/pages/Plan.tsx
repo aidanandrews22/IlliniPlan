@@ -91,6 +91,8 @@ const Plan = ({
   const [selectedSemesterId, setSelectedSemesterId] = useState<string | null>(null);
   const [courseRelationships, setCourseRelationships] = useState<Map<string, CourseRelationships>>(new Map());
   const [courseHighlights, setCourseHighlights] = useState<Map<string, CourseHighlightState>>(new Map());
+  const [isCompactView, setIsCompactView] = useState(true);
+  const [isGridLayout, setIsGridLayout] = useState(false);
 
   const moveCourseCard = useCallback(({
     movedCourseCardIndexInSourceSemester,
@@ -512,6 +514,28 @@ const Plan = ({
             isHovered={isTrashHovered}
             onHoverChange={setIsTrashHovered}
           />
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => setIsCompactView(!isCompactView)}
+              className={`p-2 rounded-lg transition-colors duration-200 ${
+                isCompactView 
+                  ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' 
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+              }`}
+            >
+              {isCompactView ? '✓ Compact' : 'Compact'}
+            </button>
+            <button
+              onClick={() => setIsGridLayout(!isGridLayout)}
+              className={`p-2 rounded-lg transition-colors duration-200 ${
+                isGridLayout 
+                  ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' 
+                  : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
+              }`}
+            >
+              {isGridLayout ? '✓ Grid' : 'Grid'}
+            </button>
+          </div>
         </div>
         <button
           onClick={() => setIsNewSemesterModalOpen(true)}
@@ -547,6 +571,8 @@ const Plan = ({
               courseIds={courseIds}
               courseHighlights={courseHighlights}
               onCourseHover={handleCourseHover}
+              isCompactView={isCompactView}
+              isGridLayout={isGridLayout}
             />
           ))}
         </div>

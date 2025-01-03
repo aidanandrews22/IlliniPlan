@@ -22,6 +22,8 @@ interface SemesterProps {
   courseHighlights?: Map<string, CourseHighlightState>;
   onCourseHover?: (courseCode: string | null) => void;
   userId?: number;
+  isCompactView?: boolean;
+  isGridLayout?: boolean;
 }
 
 const Semester = ({ 
@@ -40,7 +42,9 @@ const Semester = ({
   courseIds = {},
   courseHighlights = new Map(),
   onCourseHover,
-  userId
+  userId,
+  isCompactView,
+  isGridLayout
 }: SemesterProps) => {
   const semesterRef = useRef<HTMLDivElement>(null);
   const [isDraggedOver, setIsDraggedOver] = useState(false);
@@ -118,19 +122,22 @@ const Semester = ({
         </div>
       </div>
       <div className="p-4 space-y-3">
-        {coursecards.map((course) => (
-          <CourseCard 
-            key={course.id} 
-            {...course}
-            isDragged={draggedCourseId === course.id}
-            isTrashHovered={isTrashHovered && draggedCourseId === course.id}
-            onDragStart={() => onDragStart(course.id)}
-            onDragEnd={onDragEnd}
-            databaseId={courseIds[course.id]}
-            highlightState={courseHighlights.get(`${course.subject} ${course.number}`)}
-            onHover={onCourseHover}
-          />
-        ))}
+        <div className={`${isGridLayout ? 'grid grid-cols-2 gap-3' : 'space-y-3'}`}>
+          {coursecards.map((course) => (
+            <CourseCard 
+              key={course.id} 
+              {...course}
+              isDragged={draggedCourseId === course.id}
+              isTrashHovered={isTrashHovered && draggedCourseId === course.id}
+              onDragStart={() => onDragStart(course.id)}
+              onDragEnd={onDragEnd}
+              databaseId={courseIds[course.id]}
+              highlightState={courseHighlights.get(`${course.subject} ${course.number}`)}
+              onHover={onCourseHover}
+              isCompact={isCompactView}
+            />
+          ))}
+        </div>
         {coursecards.length === 0 && (
           <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             Drop courses here

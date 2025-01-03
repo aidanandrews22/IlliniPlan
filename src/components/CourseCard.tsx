@@ -23,6 +23,7 @@ interface CourseCardProps extends DisplayCourse {
   databaseId?: number;
   highlightState?: CourseHighlightState;
   onHover?: (courseCode: string | null) => void;
+  isCompact?: boolean;
 }
 
 const CourseCard = ({ 
@@ -40,7 +41,8 @@ const CourseCard = ({
   onDragEnd,
   databaseId,
   highlightState = { isPrereq: false, isPostreq: false, isCoreq: false },
-  onHover
+  onHover,
+  isCompact
 }: CourseCardProps) => {
   const coursecardRef = useRef<HTMLDivElement>(null);
   const [closestEdge, setClosestEdge] = useState<Edge | null>(null);
@@ -180,32 +182,35 @@ const CourseCard = ({
             : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:shadow-md'
         } ${getHighlightClasses()}`}
       >
-        <div className="p-4">
+        <div className={`${isCompact ? 'p-2' : 'p-4'}`}>
           <div className="flex items-start justify-between">
             <div onClick={handleClick} className="flex-grow">
-              <h3 className={`text-lg font-semibold transition-colors duration-200 ${
-                isTrashHovered 
-                  ? 'text-red-600 dark:text-red-400' 
-                  : 'text-gray-900 dark:text-gray-100'
-              }`}>
-                {subject} {number}
-              </h3>
-              <p className={`text-sm mt-1 transition-colors duration-200 ${
-                isTrashHovered 
-                  ? 'text-red-500/80 dark:text-red-400/80' 
-                  : 'text-gray-600 dark:text-gray-400'
-              }`}>
-                {name}
-              </p>
+              <div className={`flex items-center justify-between ${isCompact ? 'space-x-2' : ''}`}>
+                <h3 className={`font-semibold transition-colors duration-200 ${
+                  isTrashHovered 
+                    ? 'text-red-600 dark:text-red-400' 
+                    : 'text-gray-900 dark:text-gray-100'
+                } ${isCompact ? 'text-sm' : 'text-lg'}`}>
+                  {subject} {number}
+                </h3>
+                <span className={`font-medium transition-colors duration-200 ${
+                  isTrashHovered 
+                    ? 'text-red-500 dark:text-red-400' 
+                    : 'text-primary dark:text-primary'
+                } ${isCompact ? 'text-xs' : 'text-sm'}`}>
+                  {creditHours?.replace(/to/gi, '-').replace(/[^\d.\-]/g, '').split('.')[0]} hrs
+                </span>
+              </div>
+              {!isCompact && (
+                <p className={`text-sm mt-1 transition-colors duration-200 ${
+                  isTrashHovered 
+                    ? 'text-red-500/80 dark:text-red-400/80' 
+                    : 'text-gray-600 dark:text-gray-400'
+                }`}>
+                  {name}
+                </p>
+              )}
             </div>
-            <span className={`text-sm font-medium transition-colors duration-200 ${
-              isTrashHovered 
-                ? 'text-red-500 dark:text-red-400' 
-                : 'text-primary dark:text-primary'
-            }`}>
-              {/* {creditHours?.replace(/[^\d.\-]/g, '').split('.')[0]} hrs */}
-              {creditHours?.replace(/to/gi, '-').replace(/[^\d.\-]/g, '').split('.')[0]} hrs
-            </span>
           </div>
         </div>
         {closestEdge && (
