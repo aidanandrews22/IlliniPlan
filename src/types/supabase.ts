@@ -60,6 +60,7 @@ export interface Database {
           plan_name: string
           created_at: string
           updated_at: string
+          complete: boolean
         }
         Insert: {
           id?: number
@@ -68,6 +69,7 @@ export interface Database {
           plan_name?: string
           created_at?: string
           updated_at?: string
+          complete?: boolean
         }
         Update: {
           id?: number
@@ -76,6 +78,7 @@ export interface Database {
           plan_name?: string
           created_at?: string
           updated_at?: string
+          complete?: boolean
         }
       }
       semester_plan_courses: {

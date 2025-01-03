@@ -4,7 +4,7 @@ import { getReorderDestinationIndex } from "@atlaskit/pragmatic-drag-and-drop-hi
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { reorder } from "@atlaskit/pragmatic-drag-and-drop/reorder";
 import { dbQueue } from '../utils/dbQueue';
-import { buildCourseRelationships, formatCourseCode } from '../utils/courseUtils';
+import { buildCourseRelationships, formatCourseCode, getAllPrerequisites, getAllPostrequisites } from '../utils/courseUtils';
 
 import Semester from "../components/Semester";
 import DegreeTotals from '../components/DegreeTotals';
@@ -431,8 +431,12 @@ const Plan = ({
     const relationships = courseRelationships.get(hoveredCourseCode);
 
     if (relationships) {
-      // Set highlights for prerequisites
-      relationships.prerequisites.forEach(prereq => {
+      // Get all recursive prerequisites and postrequisites
+      const allPrereqs = getAllPrerequisites(hoveredCourseCode, courseRelationships);
+      const allPostreqs = getAllPostrequisites(hoveredCourseCode, courseRelationships);
+
+      // Set highlights for all prerequisites
+      allPrereqs.forEach(prereq => {
         newHighlights.set(prereq, {
           isPrereq: true,
           isPostreq: false,
@@ -440,8 +444,8 @@ const Plan = ({
         });
       });
 
-      // Set highlights for postrequisites
-      relationships.postrequisites.forEach(postreq => {
+      // Set highlights for all postrequisites
+      allPostreqs.forEach(postreq => {
         newHighlights.set(postreq, {
           isPrereq: false,
           isPostreq: true,

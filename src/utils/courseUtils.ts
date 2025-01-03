@@ -183,6 +183,52 @@ export const formatCourseCode = (subject: string, number: string): string => {
   return `${subject} ${number}`;
 };
 
+// Helper function to recursively gather all prerequisites
+export const getAllPrerequisites = (
+  courseCode: string,
+  relationships: Map<string, CourseRelationships>,
+  visited = new Set<string>()
+): string[] => {
+  if (visited.has(courseCode)) return [];
+  visited.add(courseCode);
+
+  const courseRels = relationships.get(courseCode);
+  if (!courseRels) return [];
+
+  const allPrereqs = [...courseRels.prerequisites];
+  
+  // Recursively get prerequisites of prerequisites
+  courseRels.prerequisites.forEach(prereq => {
+    const deeperPrereqs = getAllPrerequisites(prereq, relationships, visited);
+    allPrereqs.push(...deeperPrereqs);
+  });
+
+  return [...new Set(allPrereqs)]; // Remove duplicates
+};
+
+// Helper function to recursively gather all postrequisites
+export const getAllPostrequisites = (
+  courseCode: string,
+  relationships: Map<string, CourseRelationships>,
+  visited = new Set<string>()
+): string[] => {
+  if (visited.has(courseCode)) return [];
+  visited.add(courseCode);
+
+  const courseRels = relationships.get(courseCode);
+  if (!courseRels) return [];
+
+  const allPostreqs = [...courseRels.postrequisites];
+  
+  // Recursively get postrequisites of postrequisites
+  courseRels.postrequisites.forEach(postreq => {
+    const deeperPostreqs = getAllPostrequisites(postreq, relationships, visited);
+    allPostreqs.push(...deeperPostreqs);
+  });
+
+  return [...new Set(allPostreqs)]; // Remove duplicates
+};
+
 // Builds a map of course relationships from the prerequisite data
 export const buildCourseRelationships = (
   courses: { id: string; subject: string; number: string }[],
