@@ -26,7 +26,11 @@ const genEdDescriptions: Record<string, string> = {
 export const formatCreditHours = (hours: string | null) => {
   if (!hours) return 'N/A';
   // Strip all characters except numbers and decimal points, then add 'hours' suffix
-  const cleanHours = hours.replace(/[^\d]/g, '');
+  // const cleanHours = hours.replace(/[^\d]/g, '');
+  // const cleanHours = hours.replace(/[^\d-]/g, '');
+  const cleanHours = hours.replace(/to/gi, '-').replace(/[^\d-]/g, '');
+
+
   return `${cleanHours} hours`;
 };
 

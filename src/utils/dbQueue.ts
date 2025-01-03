@@ -180,6 +180,7 @@ class DbOperationQueue {
           const semesterInfo = parseSemesterId(semesterId);
           if (!semesterInfo) throw new Error('Invalid semester ID');
 
+          // Create or get the semester plan
           await getOrCreateSemesterPlan(userId, semesterInfo.year, semesterInfo.season);
           break;
         }

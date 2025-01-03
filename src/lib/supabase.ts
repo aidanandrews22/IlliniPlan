@@ -556,12 +556,57 @@ export async function getSemesterPlan(userId: number, year: number, season: 'fa'
 // Get or create semester plan
 export async function getOrCreateSemesterPlan(userId: number, year: number, season: 'fa' | 'sp' | 'su' | 'wi') {
   try {
-    // First try to get existing plan
-    const existingPlan = await getSemesterPlan(userId, year, season);
-    if (existingPlan) return existingPlan;
+    // Get the term ID first
+    const termId = await getTermId(year, season);
+    if (!termId) {
+      console.error('Could not get/create term');
+      return null;
+    }
+
+    // Check for existing plan with this user_id and term_id
+    const { data: existingPlan, error: fetchError } = await supabase
+      .from('semester_plans')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('term_id', termId)
+      .single();
+
+    if (!fetchError && existingPlan) {
+      return existingPlan;
+    }
 
     // If plan doesn't exist, create it
-    return await createSemesterPlan(userId, year, season);
+    const planName = `${seasonNames[season]} ${year}`;
+    const { data: newPlan, error: createError } = await supabase
+      .from('semester_plans')
+      .insert([{
+        user_id: userId,
+        term_id: termId,
+        plan_name: planName
+      }])
+      .select()
+      .single();
+
+    if (createError) {
+      // Check if error is due to unique constraint violation
+      if (createError.code === '23505') { // PostgreSQL unique violation code
+        // Try to fetch the existing plan one more time
+        const { data: retryPlan, error: retryError } = await supabase
+          .from('semester_plans')
+          .select('*')
+          .eq('user_id', userId)
+          .eq('term_id', termId)
+          .single();
+
+        if (!retryError && retryPlan) {
+          return retryPlan;
+        }
+      }
+      console.error('Error creating semester plan:', createError);
+      return null;
+    }
+
+    return newPlan;
   } catch (e) {
     console.error('Unexpected error in getOrCreateSemesterPlan:', e);
     return null;

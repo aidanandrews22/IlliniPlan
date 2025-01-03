@@ -62,6 +62,17 @@ interface PlanProps {
   coursePrereqs?: { courseId: number; prereqLogic: any }[];
 }
 
+const SEASON_ORDER: Record<string, number> = {
+  'SPRING': 0,
+  'SP': 0,
+  'SUMMER': 1,
+  'SU': 1,
+  'FALL': 2,
+  'FA': 2,
+  'WINTER': 3,
+  'WI': 3
+};
+
 const Plan = ({ 
   semestersData, 
   setSemestersData, 
@@ -447,6 +458,31 @@ const Plan = ({
     );
   }
 
+  // Sort semesters by year and season
+  const sortedSemesters = Object.values(semestersData).sort((a, b) => {
+    // Use plan_name which is in format "Fall 2024" or "Fa 2024"
+    const [aSeasonStr, aYearStr] = a.name.split(' ');
+    const [bSeasonStr, bYearStr] = b.name.split(' ');
+    const aYear = parseInt(aYearStr);
+    const bYear = parseInt(bYearStr);
+    
+    // Primary sort by year
+    if (aYear !== bYear) {
+      return aYear - bYear;
+    }
+    
+    // Secondary sort by season within the same year using calendar order
+    const aOrder = SEASON_ORDER[aSeasonStr.toUpperCase()];
+    const bOrder = SEASON_ORDER[bSeasonStr.toUpperCase()];
+    
+    if (aOrder === undefined || bOrder === undefined) {
+      console.error('Unknown season format:', aSeasonStr, 'or', bSeasonStr);
+      return 0;
+    }
+    
+    return aOrder - bOrder;
+  });
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -477,7 +513,7 @@ const Plan = ({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {Object.values(semestersData).map((semester) => (
+          {sortedSemesters.map((semester) => (
             <Semester
               key={semester.id}
               {...semester}
