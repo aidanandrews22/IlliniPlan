@@ -1,6 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../types/supabase';
 import type { UserResource } from '@clerk/types';
+import { searchCoursesHelper } from '../utils/search';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -34,108 +35,7 @@ export async function getCourse(subject: string, number: string) {
 }
 
 export async function searchCourses(query: string, page = 1, limit = 50, subject?: string) {
-  const start = (page - 1) * limit;
-  const end = start + limit - 1;
-
-  // Strip punctuation and normalize whitespace
-  const sanitizedQuery = query.replace(/[^\w\s]/g, '').replace(/\s+/g, ' ').trim();
-  
-  // Parse potential course code from query (e.g., "CS 124" or "CS124")
-  const courseCodeMatch = sanitizedQuery.match(/^([A-Za-z]+)\s*(\d+)$/);
-  
-  let coursesQuery = supabase
-    .from('courses')
-    .select(`
-      *,
-      course_geneds!course_geneds_course_id_fkey (*),
-      course_prereqs!course_prereqs_course_id_fkey (*),
-      course_offerings!course_offerings_course_id_fkey (
-        *,
-        terms!course_offerings_term_id_fkey (*)
-      ),
-      course_gpas!course_gpas_course_id_fkey (*)
-    `);
-
-  // Apply subject filter if provided
-  if (subject) {
-    coursesQuery = coursesQuery.eq('subject', subject);
-  }
-
-  // If query matches course code pattern, try exact match first
-  if (courseCodeMatch) {
-    const [, querySubject, queryNumber] = courseCodeMatch;
-    coursesQuery = coursesQuery.or(
-      `and(subject.ilike.${querySubject},number.eq.${queryNumber}),` +
-      `subject.ilike.%${sanitizedQuery}%,number.ilike.%${sanitizedQuery}%,title.ilike.%${sanitizedQuery}%`
-    );
-  } 
-  // Otherwise use the original fuzzy search
-  else if (sanitizedQuery && sanitizedQuery !== '*') {
-    coursesQuery = coursesQuery.or(`subject.ilike.%${sanitizedQuery}%,number.ilike.%${sanitizedQuery}%,title.ilike.%${sanitizedQuery}%`);
-  }
-
-  const { data, error } = await coursesQuery
-    .range(start, end)
-    .order('subject')
-    .order('number');
-
-  if (error) {
-    console.error('Error searching courses:', error);
-    return { data: [], count: 0 };
-  }
-
-  // If we found an exact match, move it to the top of the results
-  if (courseCodeMatch && data) {
-    const [, querySubject, queryNumber] = courseCodeMatch;
-    const exactMatch = data.find(
-      course => {
-        const sanitizedSubject = course.subject.replace(/[^\w\s]/g, '').trim();
-        const sanitizedNumber = course.number.replace(/[^\w\s]/g, '').trim();
-        return sanitizedSubject.toLowerCase() === querySubject.toLowerCase() && 
-               sanitizedNumber === queryNumber;
-      }
-    );
-    if (exactMatch) {
-      const otherResults = data.filter(course => course.id !== exactMatch.id);
-      data.splice(0, data.length, exactMatch, ...otherResults);
-    }
-  }
-
-  let countQuery = supabase
-    .from('courses')
-    .select('*', { count: 'exact', head: true });
-
-  // Apply subject filter to count query if provided
-  if (subject) {
-    countQuery = countQuery.eq('subject', subject);
-  }
-
-  if (courseCodeMatch) {
-    const [, querySubject, queryNumber] = courseCodeMatch;
-    countQuery = countQuery.or(
-      `and(subject.ilike.${querySubject},number.eq.${queryNumber}),` +
-      `subject.ilike.%${sanitizedQuery}%,number.ilike.%${sanitizedQuery}%,title.ilike.%${sanitizedQuery}%`
-    );
-  } else if (sanitizedQuery && sanitizedQuery !== '*') {
-    countQuery = countQuery.or(`subject.ilike.%${sanitizedQuery}%,number.ilike.%${sanitizedQuery}%,title.ilike.%${sanitizedQuery}%`);
-  }
-
-  const { count } = await countQuery;
-
-  // Match GPAs with their corresponding offerings
-  if (data) {
-    data.forEach(course => {
-      if (course.course_offerings) {
-        course.course_offerings.forEach((offering: { term_id: number; course_gpas: any[] }) => {
-          offering.course_gpas = course.course_gpas?.filter(
-            (gpa: { term_id: number }) => gpa.term_id === offering.term_id
-          ) || [];
-        });
-      }
-    });
-  }
-
-  return { data: data || [], count: count || 0 };
+  return searchCoursesHelper(query, page, limit, subject);
 }
 
 // Terms
