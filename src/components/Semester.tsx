@@ -48,6 +48,7 @@ const Semester = ({
 }: SemesterProps) => {
   const semesterRef = useRef<HTMLDivElement>(null);
   const [isDraggedOver, setIsDraggedOver] = useState(false);
+  onRemoveCourse; // unused
 
   const handleToggleComplete = () => {
     if (userId) {

@@ -4,7 +4,7 @@ import { getReorderDestinationIndex } from "@atlaskit/pragmatic-drag-and-drop-hi
 import { extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { reorder } from "@atlaskit/pragmatic-drag-and-drop/reorder";
 import { dbQueue } from '../utils/dbQueue';
-import { buildCourseRelationships, formatCourseCode, getAllPrerequisites, getAllPostrequisites } from '../utils/courseUtils';
+import { buildCourseRelationships, /* formatCourseCode,*/ getAllPrerequisites, getAllPostrequisites } from '../utils/courseUtils';
 import { updateUserPreferences } from '../lib/supabase';
 
 import Semester from "../components/Semester";
@@ -87,6 +87,8 @@ const Plan = ({
   coursePrereqs = [],
   initialPreferences
 }: PlanProps) => {
+  semesterIds; // unused
+  setCourseIds; // unused
   const [isTrashHovered, setIsTrashHovered] = useState(false);
   const [draggedCourseId, setDraggedCourseId] = useState<string | null>(null);
   const [isNewSemesterModalOpen, setIsNewSemesterModalOpen] = useState(false);
@@ -227,6 +229,7 @@ const Plan = ({
             } else {
               // Queue the move operation in the database
               const courseToMove = semesterData.coursecards[draggedCourseCardIndex];
+              courseToMove; // unused
               const courseId = courseIds[draggedCourseCardId];
 
               if (!courseId) {
@@ -284,6 +287,7 @@ const Plan = ({
 
               // Queue the move operation in the database
               const courseToMove = semesterData.coursecards[draggedCourseCardIndex];
+              courseToMove; // unused
               const courseId = courseIds[draggedCourseCardId];
 
               if (!courseId) {

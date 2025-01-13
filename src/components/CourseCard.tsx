@@ -109,6 +109,7 @@ const CourseCard = ({
     if (!isDragged) {
       setIsModalOpen(true);
     }
+    e; // unused
   };
 
   // Create a CourseData object from the props

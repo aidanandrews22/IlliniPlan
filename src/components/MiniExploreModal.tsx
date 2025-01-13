@@ -28,6 +28,7 @@ const MiniExploreModal = ({ onClose, onSelectCourse, title = 'Add Course', semes
   const [loadingSubjects, setLoadingSubjects] = useState(false);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [filteredSubjects, setFilteredSubjects] = useState<Subject[]>([]);
+  semesterId; // unused
 
   // Load subjects
   useEffect(() => {

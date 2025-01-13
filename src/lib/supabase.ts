@@ -131,6 +131,7 @@ export async function getSubjects(query?: string) {
     
     if (error) {
       console.error('Error fetching subjects:', error);
+      console.log("Query:", query);
       return [];
     }
 
@@ -154,6 +155,7 @@ export async function getUserId(user: UserResource) {
 
         if (error) {
             console.error('Error fetching user id:', error);
+            console.log("User email and name:", userEmail, ", and ", userName);
             return null;
         }   
 
@@ -192,7 +194,7 @@ export async function getOrCreateUser(user: UserResource) {
 
   try {
     // First try to get the existing user
-    let { data: existingUser, error: fetchError } = await supabase
+    const { data: existingUser, error: fetchError } = await supabase
       .from('users')
       .select('*')
       .eq('clerk_id', user.id)
