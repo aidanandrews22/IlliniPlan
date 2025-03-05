@@ -1,0 +1,252 @@
+{
+  "DegreeRequirements": [
+    {
+      "id": "1",
+      "name": "General Education Requirements",
+      "description": "Courses that provide a breadth of knowledge across disciplines",
+      "totalHours": 36,
+      "completedHours": 40,
+      "courses": [
+        {
+          "subject": "Composition",
+          "number": "I",
+          "name": "Composition I",
+          "creditHours": "4-6"
+        },
+        {
+          "subject": "Advanced",
+          "number": "Composition",
+          "name": "Advanced Composition",
+          "creditHours": "3"
+        },
+        {
+          "subject": "Humanities",
+          "number": "&",
+          "name": "Humanities & the Arts",
+          "creditHours": "6"
+        },
+        {
+          "subject": "Natural",
+          "number": "Sciences",
+          "name": "Natural Sciences & Technology",
+          "creditHours": "6"
+        },
+        {
+          "subject": "Social",
+          "number": "&",
+          "name": "Social & Behavioral Sciences",
+          "creditHours": "6"
+        },
+        {
+          "subject": "Cultural",
+          "number": "Studies:",
+          "name": "Cultural Studies: Non-Western Cultures",
+          "creditHours": "3"
+        },
+        {
+          "subject": "Cultural",
+          "number": "Studies:",
+          "name": "Cultural Studies: US Minority Cultures",
+          "creditHours": "3"
+        },
+        {
+          "subject": "Cultural",
+          "number": "Studies:",
+          "name": "Cultural Studies: Western/Comparative Cultures",
+          "creditHours": "3"
+        },
+        {
+          "subject": "Quantitative",
+          "number": "Reasoning",
+          "name": "Quantitative Reasoning",
+          "creditHours": "6-10"
+        },
+        {
+          "subject": "Language",
+          "number": "Requirement",
+          "name": "Language Requirement",
+          "creditHours": "0-15"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Orientation and Professional Development",
+      "description": "",
+      "totalHours": 1,
+      "completedHours": 1,
+      "courses": [
+        {
+          "subject": "ENG",
+          "number": "100",
+          "name": "Grainger Engineering Orientation Seminar",
+          "creditHours": "1"
+        },
+        {
+          "subject": "PHYS",
+          "number": "110",
+          "name": "Physics Careers",
+          "creditHours": "0"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Foundational Mathematics and Science",
+      "description": "Required courses for the major",
+      "totalHours": 36,
+      "completedHours": 39,
+      "courses": [
+        {
+          "subject": "MATH",
+          "number": "221",
+          "name": "Calculus I",
+          "creditHours": "4"
+        },
+        {
+          "subject": "MATH",
+          "number": "231",
+          "name": "Calculus II",
+          "creditHours": "3"
+        },
+        {
+          "subject": "MATH",
+          "number": "241",
+          "name": "Calculus III",
+          "creditHours": "4"
+        },
+        {
+          "subject": "MATH",
+          "number": "257",
+          "name": "Linear Algebra with Computational Applications",
+          "creditHours": "3"
+        },
+        {
+          "subject": "MATH",
+          "number": "285",
+          "name": "Intro Differential Equations",
+          "creditHours": "3"
+        },
+        {
+          "subject": "PHYS",
+          "number": "211",
+          "name": "University Physics: Mechanics",
+          "creditHours": "4"
+        },
+        {
+          "subject": "PHYS",
+          "number": "212",
+          "name": "University Physics: Elec & Mag",
+          "creditHours": "4"
+        },
+        {
+          "subject": "PHYS",
+          "number": "213",
+          "name": "Univ Physics: Thermal Physics",
+          "creditHours": "2"
+        },
+        {
+          "subject": "PHYS",
+          "number": "214",
+          "name": "Univ Physics: Quantum Physics",
+          "creditHours": "2"
+        },
+        {
+          "subject": "CHEM",
+          "number": "102",
+          "name": "General Chemistry I",
+          "creditHours": "3"
+        },
+        {
+          "subject": "CHEM",
+          "number": "103",
+          "name": "General Chemistry Lab I",
+          "creditHours": "1"
+        },
+        {
+          "subject": "CS",
+          "number": "101",
+          "name": "Intro Computing: Engrg & Sci",
+          "creditHours": "3"
+        },
+        {
+          "subject": "CS",
+          "number": "124",
+          "name": "Introduction to Computer Science I",
+          "creditHours": "3"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Physics Technical Core",
+      "description": "Required courses for the major",
+      "totalHours": 12,
+      "completedHours": 12,
+      "courses": [
+        {
+          "subject": "PHYS",
+          "number": "225",
+          "name": "Relativity & Math Applications",
+          "creditHours": "2"
+        },
+        {
+          "subject": "PHYS",
+          "number": "325",
+          "name": "Classical Mechanics I",
+          "creditHours": "3"
+        },
+        {
+          "subject": "PHYS",
+          "number": "435",
+          "name": "Electromagnetic Fields I",
+          "creditHours": "3"
+        },
+        {
+          "subject": "PHYS",
+          "number": "486",
+          "name": "Quantum Physics I",
+          "creditHours": "4"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "name": "Free Electives",
+      "description": "Additional course work, subject to the Grainger College of Engineering restrictions to Free Electives, so that there are at least 128 credit hours earned toward the degree.",
+      "totalHours": 36,
+      "completedHours": 0,
+      "courses": []
+    },
+    {
+      "id": "6",
+      "name": "Program Tracks",
+      "description": "Students are required to complete one track.",
+      "totalHours": 21,
+      "completedHours": 0,
+      "tracks": [
+        {
+          "name": "Astrophysics Track",
+          "hours": "21"
+        },
+        {
+          "name": "Business Track",
+          "hours": "21"
+        },
+        {
+          "name": "Computational Physics Track",
+          "hours": "24"
+        },
+        {
+          "name": "Nuclear Physics Track",
+          "hours": "22"
+        },
+        {
+          "name": "Graduate Study Track",
+          "hours": "20"
+        }
+      ],
+      "courses": []
+    }
+  ]
+}

@@ -13,6 +13,7 @@ import TrashZone from '../components/TrashZone';
 import NewSemesterModal from '../components/NewSemesterModal';
 import MiniExploreModal from '../components/MiniExploreModal';
 import type { CourseData, CourseHighlightState, CourseRelationships } from '../types/database';
+import GraduationRequirementsVisualizer from '../components/GraduationRequirementsVisualizer';
 
 interface DragData {
   type: string;
@@ -25,7 +26,7 @@ interface DropTargetData {
   coursecardId?: string;
 }
 
-interface Course {
+export interface Course {
   id: string;
   subject: string;
   number: string;
@@ -40,14 +41,14 @@ interface Course {
   years: string[];
 }
 
-interface SemesterData {
+export interface SemesterData {
   id: string;
   name: string;
   completed: boolean;
   coursecards: Course[];
 }
 
-interface SemestersData {
+export interface SemestersData {
   [key: string]: SemesterData;
 }
 
@@ -61,7 +62,10 @@ interface PlanProps {
   onAddToSemester: (course: CourseData, semesterId: string) => void;
   isLoading?: boolean;
   coursePrereqs?: { courseId: number; prereqLogic: any }[];
-  initialPreferences?: { ui?: { grid?: boolean; compact?: boolean; } };
+  initialPreferences?: { 
+    ui?: { grid?: boolean; compact?: boolean; };
+    selectedDegree?: string;
+  };
 }
 
 const SEASON_ORDER: Record<string, number> = {
@@ -108,15 +112,6 @@ const Plan = ({
       setHasInitialized(true);
     }
   }, [initialPreferences]);
-
-  // Log initial preferences and chosen values
-  // useEffect(() => {
-  //   console.log('Initial preferences received:', initialPreferences);
-  //   console.log('Chosen values:', {
-  //     isCompactView,
-  //     isGridLayout
-  //   });
-  // }, [initialPreferences, isCompactView, isGridLayout]);
 
   // Update preferences when view settings change
   useEffect(() => {
@@ -596,12 +591,14 @@ const Plan = ({
             </div>
           </div>
         </div>
-        <button
-          onClick={() => setIsNewSemesterModalOpen(true)}
-          className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors duration-200"
-        >
-          Add Semester
-        </button>
+        <div className="flex items-center space-x-4">
+          <button
+            onClick={() => setIsNewSemesterModalOpen(true)}
+            className="px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-lg transition-colors duration-200"
+          >
+            Add Semester
+          </button>
+        </div>
       </div>
       {Object.keys(semestersData).length === 0 ? (
         <div className="flex flex-col items-center justify-center p-8 bg-gray-50 dark:bg-gray-800 rounded-lg space-y-4">
@@ -657,6 +654,11 @@ const Plan = ({
           semesterId={selectedSemesterId}
         />
       )}
+      <GraduationRequirementsVisualizer
+        semesters={Object.values(semestersData)}
+        courseIds={courseIds}
+        selectedDegree={initialPreferences?.selectedDegree}
+      />
     </div>
   );
 };

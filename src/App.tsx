@@ -13,7 +13,7 @@ import {
   initializeUserSemesterPlans,
   createSemesterPlan,
   parseSemesterId,
-  getUserPreferences
+  getUserPreferences,
 } from './lib/supabase';
 import { SignedIn, SignedOut } from '@clerk/clerk-react';
 import SignIn from './pages/SignIn';
@@ -324,7 +324,11 @@ const App = () => {
               />
               <Route 
                 path="/settings"
-                element={<Settings />}
+                element={<Settings 
+                  semestersData={semestersData} 
+                  setSemestersData={setSemestersData} 
+                  userPreferences={userPreferences}
+                />}
               />
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>

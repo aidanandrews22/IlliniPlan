@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import type { Database } from '../types/supabase';
-import type { UserResource } from '@clerk/types';
 import { searchCoursesHelper } from '../utils/search';
+import type { Term } from '../types/supabase';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -45,13 +45,27 @@ export async function getTerms() {
     .select('*')
     .order('year', { ascending: false })
     .order('season', { ascending: false });
-
+    
   if (error) {
     console.error('Error fetching terms:', error);
-    return [];
+    throw error;
   }
-
-  return data;
+  
+  if (!data) {
+    return { years: [], seasons: [], terms: [] };
+  }
+  
+  // Extract and create array of unique years
+  const years = [...new Set(data.map((term: Term) => term.year))];
+  
+  // Extract and create array of unique seasons
+  const seasons = [...new Set(data.map((term: Term) => term.season))];
+  
+  return {
+    years,
+    seasons,
+    terms: data as Term[]
+  };
 }
 
 // Course Offerings
@@ -143,7 +157,7 @@ export async function getSubjects(query?: string) {
 }
 
 // Get User ID
-export async function getUserId(user: UserResource) {
+export async function getUserId(user: any) {
     const userEmail = user?.emailAddresses[0]?.emailAddress;
     const userName = user?.fullName;
     try {
@@ -185,7 +199,7 @@ export async function getUserSemesters(userId: string) {
 }
 
 // User Management
-export async function getOrCreateUser(user: UserResource) {
+export async function getOrCreateUser(user: any) {
   if (!user) return null;
 
   const userEmail = user.emailAddresses[0]?.emailAddress;
@@ -669,10 +683,19 @@ export async function updateSemesterPlanCompletion(semesterPlanId: number, compl
 // User Preferences Management
 export async function updateUserPreferences(userId: number, preferences: any) {
   try {
+    // First get current preferences to preserve any existing values
+    const currentPreferences = await getUserPreferences(userId) || {};
+    
+    // Merge the new preferences with existing ones
+    const mergedPreferences = {
+      ...currentPreferences,
+      ...preferences
+    };
+    
     const { data, error } = await supabase
       .from('users')
       .update({
-        preferences,
+        preferences: mergedPreferences,
         updated_at: new Date().toISOString()
       })
       .eq('id', userId)
@@ -710,3 +733,192 @@ export async function getUserPreferences(userId: number) {
     return null;
   }
 }
+
+// Get courses for a specific semester plan
+export async function getSemesterPlanCourses(semesterPlanId: number) {
+  try {
+    const { data, error } = await supabase
+      .from('semester_plan_courses')
+      .select(`
+        *,
+        courses (*)
+      `)
+      .eq('semester_plan_id', semesterPlanId);
+
+    if (error) {
+      console.error('Error fetching semester plan courses:', error);
+      return [];
+    }
+
+    return data;
+  } catch (e) {
+    console.error('Unexpected error in getSemesterPlanCourses:', e);
+    return [];
+  }
+}
+
+/**
+ * Get course information for import functionality
+ * Uses separate queries to avoid the relationship error between course_offerings and course_gpas
+ */
+export async function getCourseForImport(subject: string, number: string) {
+  try {
+    // First, get the basic course info
+    const { data: courseData, error: courseError } = await supabase
+      .from('courses')
+      .select('*')
+      .eq('subject', subject)
+      .eq('number', number)
+      .single();
+
+    if (courseError) {
+      console.error('Error fetching course basic info:', courseError);
+      return null;
+    }
+
+    if (!courseData) {
+      return null;
+    }
+
+    // Get course prerequisites
+    const { data: prereqsData, error: prereqsError } = await supabase
+      .from('course_prereqs')
+      .select('*')
+      .eq('course_id', courseData.id);
+
+    // Get course geneds
+    const { data: genedsData, error: genedsError } = await supabase
+      .from('course_geneds')
+      .select('*')
+      .eq('course_id', courseData.id);
+
+    // Get course offerings
+    const { data: offeringsData, error: offeringsError } = await supabase
+      .from('course_offerings')
+      .select(`
+        *,
+        terms (*)
+      `)
+      .eq('course_id', courseData.id);
+
+    // Combine the data
+    return {
+      ...courseData,
+      course_prereqs: prereqsError ? [] : prereqsData,
+      course_geneds: genedsError ? [] : genedsData,
+      course_offerings: offeringsError ? [] : offeringsData
+    };
+  } catch (error) {
+    console.error('Error in getCourseForImport:', error);
+    return null;
+  }
+}
+
+// Degree courses management
+export async function addCourseToDegreeRequirement(
+  clerkId: string,
+  courseId: number,
+  requirementId: number,
+  degree: string,
+  courseTitle: string = ''
+) {
+  try {
+    // Validate required parameters
+    if (!clerkId) throw new Error('clerkId is required');
+    if (!courseId || isNaN(courseId)) throw new Error('Valid courseId is required');
+    if (!requirementId || isNaN(requirementId)) throw new Error('Valid requirementId is required');
+    if (!degree) throw new Error('degree is required');
+    
+    console.log('Adding course to degree requirement with params:', {
+      clerkId, courseId, requirementId, degree, courseTitle
+    });
+    
+    const { data, error } = await supabase
+      .from('degree_courses')
+      .insert({
+        clerk_id: clerkId,
+        course_id: courseId,
+        requirement: requirementId,
+        degree: degree,
+        course_title: courseTitle
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error adding course to degree requirement:', error);
+      return null;
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error in addCourseToDegreeRequirement:', error);
+    return null;
+  }
+}
+
+export async function getUserDegreeRequirementCourses(clerkId: string) {
+  try {
+    const { data, error } = await supabase
+      .from('degree_courses')
+      .select(`
+        *,
+        courses (
+          id,
+          subject,
+          number,
+          title,
+          credit_hours
+        )
+      `)
+      .eq('clerk_id', clerkId);
+
+    if (error) {
+      console.error('Error fetching user degree requirement courses:', error);
+      return [];
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error in getUserDegreeRequirementCourses:', error);
+    return [];
+  }
+}
+
+export async function removeUserDegreeRequirementCourse(id: number) {
+  try {
+    const { error } = await supabase
+      .from('degree_courses')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error('Error removing degree requirement course:', error);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error in removeUserDegreeRequirementCourse:', error);
+    return false;
+  }
+}
+
+export const getSelectedDegree = async (userId: string) => {
+  if (userId) {
+    const { data, error } = await supabase
+      .from('users')
+      .select('preferences')
+      .eq('clerk_id', userId)
+      .single();
+    
+    if (error) {
+      console.error('Error loading user preferences:', error);
+    }
+    
+    if (data && data.preferences) {
+      return data.preferences.selectedDegree || '';
+    }
+  }
+  return '';
+};

@@ -1,31 +1,80 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { getTerms } from '../lib/supabase';
 
 interface NewSemesterModalProps {
   onClose: () => void;
-  onSubmit: (term: string, year: number) => void;
+  onSubmit: (termSeason: string, year: number) => void;
   existingSemesters: { id: string; name: string }[];
 }
 
+// Map UI-friendly terms to database season codes
+const SEASON_MAP: Record<string, string> = {
+  'Fall': 'fa',
+  'Spring': 'sp',
+  'Summer': 'su',
+  'Winter': 'wi',
+};
+
 const TERMS = ['Fall', 'Spring', 'Summer', 'Winter'];
 const CURRENT_YEAR = new Date().getFullYear();
-const YEARS = Array.from({ length: 6 }, (_, i) => (CURRENT_YEAR - 4) + i);
 
 const NewSemesterModal = ({ onClose, onSubmit, existingSemesters }: NewSemesterModalProps) => {
   const [selectedTerm, setSelectedTerm] = useState(TERMS[0]);
   const [selectedYear, setSelectedYear] = useState(CURRENT_YEAR);
+  const [availableYears, setAvailableYears] = useState<number[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchAvailableTerms = async () => {
+      try {
+        setLoading(true);
+        const { years } = await getTerms();
+        
+        // If no years are available from the database, use default range
+        if (years.length === 0) {
+          const defaultYears = Array.from(
+            { length: 6 }, 
+            (_, i) => (CURRENT_YEAR - 4) + i
+          );
+          setAvailableYears(defaultYears);
+        } else {
+          // Use available years from database
+          setAvailableYears(years);
+          
+        }
+      } catch (err) {
+        console.error('Error fetching terms:', err);
+        // Fallback to default years if there's an error
+        const defaultYears = Array.from(
+          { length: 6 }, 
+          (_, i) => (CURRENT_YEAR - 4) + i
+        );
+        setAvailableYears(defaultYears);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAvailableTerms();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Convert UI-friendly term to database season code
+    const seasonCode = SEASON_MAP[selectedTerm];
+    
+    // Check if semester already exists using the format in your existingSemesters array
     const semesterId = `${selectedTerm.toUpperCase()}${selectedYear}`;
     
-    // Check if semester already exists
     if (existingSemesters.some(sem => sem.id === semesterId)) {
       setError(`${selectedTerm} ${selectedYear} already exists`);
       return;
     }
 
-    onSubmit(selectedTerm, selectedYear);
+    // Pass the season code instead of the display term
+    onSubmit(seasonCode, selectedYear);
     onClose();
   };
 
@@ -38,6 +87,16 @@ const NewSemesterModal = ({ onClose, onSubmit, existingSemesters }: NewSemesterM
     setSelectedYear(Number(e.target.value));
     setError(null);
   };
+
+  if (loading) {
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl max-w-md w-full p-6">
+          <p className="text-center text-gray-700 dark:text-gray-300">Loading available terms...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
@@ -93,7 +152,7 @@ const NewSemesterModal = ({ onClose, onSubmit, existingSemesters }: NewSemesterM
                 onChange={handleYearChange}
                 className="w-full px-3 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               >
-                {YEARS.map(year => (
+                {availableYears.map(year => (
                   <option key={year} value={year}>{year}</option>
                 ))}
               </select>
@@ -121,4 +180,4 @@ const NewSemesterModal = ({ onClose, onSubmit, existingSemesters }: NewSemesterM
   );
 };
 
-export default NewSemesterModal; 
+export default NewSemesterModal;

@@ -1,0 +1,353 @@
+{
+  "DegreeRequirements": [
+    {
+      "id": "1",
+      "name": "General Education Requirements",
+      "description": "Courses that provide a breadth of knowledge across disciplines",
+      "totalHours": 30,
+      "completedHours": 6,
+      "courses": [
+        {
+          "subject": "ENG",
+          "number": "100",
+          "name": "Grainger Engineering Orientation Seminar",
+          "creditHours": "1"
+        },
+        {
+          "subject": "CS",
+          "number": "100",
+          "name": "Computer Science Orientation",
+          "creditHours": "1"
+        },
+        {
+          "subject": "CS",
+          "number": "210",
+          "name": "Ethical & Professional Issues",
+          "creditHours": "2-3"
+        },
+        {
+          "subject": "CS",
+          "number": "211",
+          "name": "Ethical and Professional Conduct",
+          "creditHours": "2-3"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "name": "Foundational Mathematics and Science",
+      "description": "Students must take one course from the Natural Science & Technology (NST) list.",
+      "totalHours": 25,
+      "completedHours": 22,
+      "courses": [
+        {
+          "subject": "MATH",
+          "number": "221",
+          "name": "Calculus I",
+          "creditHours": "4"
+        },
+        {
+          "subject": "MATH",
+          "number": "231",
+          "name": "Calculus II",
+          "creditHours": "3"
+        },
+        {
+          "subject": "MATH",
+          "number": "241",
+          "name": "Calculus III",
+          "creditHours": "4"
+        },
+        {
+          "subject": "MATH",
+          "number": "257",
+          "name": "Linear Algebra with Computational Applications",
+          "creditHours": "3"
+        },
+        {
+          "subject": "PHYS",
+          "number": "211",
+          "name": "University Physics: Mechanics",
+          "creditHours": "4"
+        },
+        {
+          "subject": "PHYS",
+          "number": "212",
+          "name": "University Physics: Elec & Mag",
+          "creditHours": "4"
+        }
+      ]
+    },
+    {
+      "id": "3",
+      "name": "Computer Science Technical Core",
+      "description": "Required courses for the major",
+      "totalHours": 35,
+      "completedHours": 35,
+      "courses": [
+        {
+          "subject": "CS",
+          "number": "124",
+          "name": "Introduction to Computer Science I",
+          "creditHours": "3"
+        },
+        {
+          "subject": "CS",
+          "number": "128",
+          "name": "Introduction to Computer Science II",
+          "creditHours": "3"
+        },
+        {
+          "subject": "CS",
+          "number": "173",
+          "name": "Discrete Structures",
+          "creditHours": "3"
+        },
+        {
+          "subject": "CS",
+          "number": "222",
+          "name": "Software Design Lab",
+          "creditHours": "1"
+        },
+        {
+          "subject": "CS",
+          "number": "225",
+          "name": "Data Structures",
+          "creditHours": "4"
+        },
+        {
+          "subject": "CS",
+          "number": "233",
+          "name": "Computer Architecture",
+          "creditHours": "4"
+        },
+        {
+          "subject": "CS",
+          "number": "341",
+          "name": "System Programming",
+          "creditHours": "4"
+        },
+        {
+          "subject": "CS",
+          "number": "357",
+          "name": "Numerical Methods I",
+          "creditHours": "3"
+        },
+        {
+          "subject": "CS",
+          "number": "361",
+          "name": "Probability & Statistics for Computer Science",
+          "creditHours": "3"
+        },
+        {
+          "subject": "CS",
+          "number": "374",
+          "name": "Introduction to Algorithms & Models of Computation",
+          "creditHours": "4"
+        },
+        {
+          "subject": "CS",
+          "number": "421",
+          "name": "Programming Languages & Compilers",
+          "creditHours": "3"
+        }
+      ]
+    },
+    {
+      "id": "4",
+      "name": "Technical Electives",
+      "description": "At least one of the CS courses used for technical electives must be chosen from the team project course list.",
+      "totalHours": 18,
+      "completedHours": 0,
+      "courses": [],
+      "focusAreas": [
+        {
+          "name": "Software Foundations",
+          "description": "Courses focusing on software development and design.",
+          "courses": [
+            {
+              "subject": "CS",
+              "number": "407",
+              "name": "Cryptography",
+              "creditHours": "3 or 4"
+            },
+            {
+              "subject": "CS",
+              "number": "409",
+              "name": "The Art of Web Programming",
+              "creditHours": "3"
+            },
+            {
+              "subject": "CS",
+              "number": "422",
+              "name": "Programming Language Design",
+              "creditHours": "3 or 4"
+            },
+            {
+              "subject": "CS",
+              "number": "426",
+              "name": "Compiler Construction",
+              "creditHours": "3 or 4"
+            },
+            {
+              "subject": "CS",
+              "number": "427",
+              "name": "Software Engineering I",
+              "creditHours": "3 or 4"
+            },
+            {
+              "subject": "CS",
+              "number": "428",
+              "name": "Software Engineering II",
+              "creditHours": "3 or 4"
+            },
+            {
+              "subject": "CS",
+              "number": "429",
+              "name": "Software Engineering II, ACP",
+              "creditHours": "3"
+            },
+            {
+              "subject": "CS",
+              "number": "474",
+              "name": "Logic in Computer Science",
+              "creditHours": "3 or 4"
+            },
+            {
+              "subject": "CS",
+              "number": "492",
+              "name": "Senior Project I",
+              "creditHours": "3"
+            },
+            {
+              "subject": "CS",
+              "number": "493",
+              "name": "Senior Project II, ACP",
+              "creditHours": "3"
+            },
+            {
+              "subject": "CS",
+              "number": "494",
+              "name": "Senior Project II",
+              "creditHours": "3"
+            },
+            {
+              "subject": "CS",
+              "number": "521",
+              "name": "Advanced Topics in Programming Systems",
+              "creditHours": "4"
+            },
+            {
+              "subject": "CS",
+              "number": "522",
+              "name": "Programming Language Semantics",
+              "creditHours": "4"
+            },
+            {
+              "subject": "CS",
+              "number": "524",
+              "name": "Concurrent Programming Languages",
+              "creditHours": "4"
+            },
+            {
+              "subject": "CS",
+              "number": "526",
+              "name": "Advanced Compiler Construction",
+              "creditHours": "4"
+            },
+            {
+              "subject": "CS",
+              "number": "527",
+              "name": "Topics in Software Engineering",
+              "creditHours": "4"
+            },
+            {
+              "subject": "CS",
+              "number": "576",
+              "name": "Topics in Automated Deduction",
+              "creditHours": "2 to 4"
+            }
+          ]
+        }
+      ],
+      "teamProjects": [
+        {
+          "subject": "CS",
+          "number": "417",
+          "name": "Virtual Reality",
+          "creditHours": "3"
+        },
+        {
+          "subject": "CS",
+          "number": "427",
+          "name": "Software Engineering I",
+          "creditHours": "3 or 4"
+        },
+        {
+          "subject": "CS",
+          "number": "428",
+          "name": "Software Engineering II",
+          "creditHours": "3 or 4"
+        },
+        {
+          "subject": "CS",
+          "number": "429",
+          "name": "Software Engineering II, ACP",
+          "creditHours": "3"
+        },
+        {
+          "subject": "CS",
+          "number": "437",
+          "name": "Topics in Internet of Things",
+          "creditHours": "3"
+        },
+        {
+          "subject": "CS",
+          "number": "465",
+          "name": "User Interface Design",
+          "creditHours": "4"
+        },
+        {
+          "subject": "CS",
+          "number": "467",
+          "name": "Social Visualization",
+          "creditHours": "3 or 4"
+        },
+        {
+          "subject": "CS",
+          "number": "493",
+          "name": "Senior Project II, ACP",
+          "creditHours": "3"
+        },
+        {
+          "subject": "CS",
+          "number": "494",
+          "name": "Senior Project II",
+          "creditHours": "3"
+        },
+        {
+          "subject": "CS",
+          "number": "497",
+          "name": "CS Team Project",
+          "creditHours": "1 to 3"
+        }
+      ]
+    },
+    {
+      "id": "5",
+      "name": "Computer Science Advanced Electives",
+      "description": "Students must take for a letter grade a minimum of two advanced elective courses comprising at least six credit hours.",
+      "totalHours": 6,
+      "completedHours": 0,
+      "courses": []
+    },
+    {
+      "id": "6",
+      "name": "Free Electives",
+      "description": "Additional course work, subject to the Grainger College of Engineering restrictions to Free Electives.",
+      "totalHours": 24,
+      "completedHours": 0,
+      "courses": []
+    }
+  ]
+}

@@ -32,6 +32,7 @@ export interface Database {
           last_name: string
           created_at: string
           updated_at: string
+          preferences: Json | null
         }
         Insert: {
           id?: number
@@ -41,6 +42,7 @@ export interface Database {
           last_name: string
           created_at?: string
           updated_at?: string
+          preferences?: Json | null
         }
         Update: {
           id?: number
@@ -50,6 +52,7 @@ export interface Database {
           last_name?: string
           created_at?: string
           updated_at?: string
+          preferences?: Json | null
         }
       }
       semester_plans: {
@@ -293,6 +296,29 @@ export interface Database {
           sbs?: 'False' | 'SS' | 'BSC' | null
         }
       }
+      degree_courses: {
+        Row: {
+          id: number
+          user_id: string
+          course_id: number
+          requirement: number
+          title: string
+        }
+        Insert: {
+          id?: number
+          user_id: string
+          course_id: number
+          requirement: number
+          title: string
+        }
+        Update: {
+          id?: number
+          user_id?: string
+          course_id?: number
+          requirement?: number
+          title?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -305,3 +331,10 @@ export interface Database {
     }
   }
 } 
+
+export interface Term {
+  id: number;
+  year: number;
+  season: string;
+  combined: string;
+}
