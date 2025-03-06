@@ -176,64 +176,76 @@ const GraduationRequirementsVisualizer = ({
         
         console.log("Using degree file:", degreeFileName);
         
-        // Import the JSON file using the determined filename
-        const degreeModule = await import(`../assets/degree/${degreeFileName}`);
-        const degreeData: DegreeJson = degreeModule.default;
-        
-        if (!degreeData || !degreeData.DegreeRequirements) {
-          console.error('Invalid degree data format');
-          setLoadingError('Invalid degree data format');
-          setRequirementsData([]);
-          return;
-        }
-        
-        // Convert the JSON data to our DegreeRequirement format
-        const formattedRequirements: DegreeRequirement[] = degreeData.DegreeRequirements.map(req => {
-          // Convert JSON courses to DisplayCourse format
-          const displayCourses: DisplayCourse[] = req.courses.map((course, index) => ({
-            id: `${course.subject}-${course.number}-${index}`,
-            subject: course.subject,
-            number: course.number,
-            name: course.name,
-            description: '',
-            creditHours: course.creditHours,
-            terms: [],
-            yearTerms: [],
-            years: []
-          }));
+        // Fetch the JSON file using the determined filename
+        try {
+          const response = await fetch(`https://aidanandrews22.github.io/content/aaxiom/illiniplan/${degreeFileName}`);
           
-          // Add focus area courses if they exist
-          if (req.focusAreas && req.focusAreas.length > 0) {
-            req.focusAreas.forEach(area => {
-              area.courses.forEach((course, index) => {
-                displayCourses.push({
-                  id: `${area.name}-${course.subject}-${course.number}-${index}`,
-                  subject: course.subject,
-                  number: course.number,
-                  name: course.name,
-                  description: '',
-                  creditHours: course.creditHours,
-                  terms: [],
-                  yearTerms: [],
-                  years: []
-                });
-              });
-            });
+          if (!response.ok) {
+            throw new Error(`Failed to fetch degree data: ${response.status} ${response.statusText}`);
           }
           
-          return {
-            id: req.id,
-            name: req.name,
-            description: req.description,
-            totalHours: req.totalHours,
-            // Initialize completedHours to 0 - we'll calculate it from user courses
-            completedHours: 0,
-            courses: displayCourses
-          };
-        });
-        
-        setLoadingError(null);
-        setRequirementsData(formattedRequirements);
+          const degreeData: DegreeJson = await response.json();
+          
+          if (!degreeData || !degreeData.DegreeRequirements) {
+            console.error('Invalid degree data format');
+            setLoadingError('Invalid degree data format');
+            setRequirementsData([]);
+            return;
+          }
+          
+          // Convert the JSON data to our DegreeRequirement format
+          const formattedRequirements: DegreeRequirement[] = degreeData.DegreeRequirements.map(req => {
+            // Convert JSON courses to DisplayCourse format
+            const displayCourses: DisplayCourse[] = req.courses.map((course, index) => ({
+              id: `${course.subject}-${course.number}-${index}`,
+              subject: course.subject,
+              number: course.number,
+              name: course.name,
+              description: '',
+              creditHours: course.creditHours,
+              terms: [],
+              yearTerms: [],
+              years: []
+            }));
+            
+            // Add focus area courses if they exist
+            if (req.focusAreas && req.focusAreas.length > 0) {
+              req.focusAreas.forEach(area => {
+                area.courses.forEach((course, index) => {
+                  displayCourses.push({
+                    id: `${area.name}-${course.subject}-${course.number}-${index}`,
+                    subject: course.subject,
+                    number: course.number,
+                    name: course.name,
+                    description: '',
+                    creditHours: course.creditHours,
+                    terms: [],
+                    yearTerms: [],
+                    years: []
+                  });
+                });
+              });
+            }
+            
+            return {
+              id: req.id,
+              name: req.name,
+              description: req.description,
+              totalHours: req.totalHours,
+              // Initialize completedHours to 0 - we'll calculate it from user courses
+              completedHours: 0,
+              courses: displayCourses
+            };
+          });
+          
+          setLoadingError(null);
+          setRequirementsData(formattedRequirements);
+        } catch (error) {
+          console.error('Error loading degree requirements:', error);
+          setLoadingError(`Failed to load degree requirements: ${error instanceof Error ? error.message : String(error)}`);
+          // Fallback to empty requirements if loading fails
+          setRequirementsData([]);
+        }
       } catch (error) {
         console.error('Error loading degree requirements:', error);
         setLoadingError(`Failed to load degree requirements: ${error instanceof Error ? error.message : String(error)}`);
